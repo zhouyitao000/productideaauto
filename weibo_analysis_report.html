@@ -161,8 +161,8 @@
             color: var(--color-text);
         }
 
-        /* Timeline */
-        .timeline-section h4, .summary-section h4, .creative-section h4 {
+        /* Timeline (Removed in script, but style kept for rubric list) */
+        .summary-section h4, .creative-section h4 {
             font-size: 1.2rem;
             margin-bottom: 1rem;
             color: var(--color-text);
@@ -441,7 +441,8 @@
             <label for="timeFilter">选择数据时间:</label>
             <select id="timeFilter" onchange="filterData()">
                 <option value="all">显示全部</option>
-                <option value="2026-01-21 15:00">2026-01-21 15:00</option>
+                <option value="2026-01-21 16:00">2026-01-21 16:00</option>
+<option value="2026-01-21 15:00">2026-01-21 15:00</option>
 <option value="2026-01-21 15:00">2026-01-21 15:00</option>
 <option value="2026-01-21 15:00">2026-01-21 15:00</option>
             </select>
@@ -451,22 +452,22 @@
         <section class="summary-grid">
             <div class="summary-card">
                 <h3>优秀创意</h3>
-                <div class="value">8</div>
+                <div class="value">7</div>
                 <div class="label">综合评分 ≥ 80</div>
             </div>
             <div class="summary-card">
                 <h3>良好创意</h3>
-                <div class="value">2</div>
+                <div class="value">3</div>
                 <div class="label">60 ≤ 评分 < 80</div>
             </div>
             <div class="summary-card">
                 <h3>平均综合评分</h3>
-                <div class="value">82.4</div>
+                <div class="value">83.1</div>
                 <div class="label">所有创意平均值</div>
             </div>
             <div class="summary-card">
                 <h3>最高评分</h3>
-                <div class="value">87.0</div>
+                <div class="value">89.0</div>
                 <div class="label">最佳创意</div>
             </div>
         </section>
@@ -474,6 +475,429 @@
         <!-- Topic Analysis Sections -->
         <div id="contentArea">
             
+            <div class="data-batch" data-hour="2026-01-21 16:00">
+                <div class="batch-header" style="margin: 2rem 0; padding-bottom: 0.5rem; border-bottom: 2px solid #e5e7eb;">
+                    <h2 style="color: #4b5563;">数据时间: 2026-01-21 16:07:40</h2>
+                </div>
+                
+                <section class="topic-section">
+                    <div class="topic-header">
+                        <span class="topic-rank">1</span>
+                        <div style="flex-grow: 1;">
+                            <h2 class="topic-title">10元一斤草莓和300元一斤草莓区别</h2>
+                            <span class="topic-label"></span>
+                            <span class="hot-value">🔥 1078428</span>
+                        </div>
+                    </div>
+
+                    <div class="summary-section">
+                        <h4>热点详细信息</h4>
+                        <p>该热搜话题探讨了不同价位草莓（10元/斤 vs 300元/斤）的差异，反映了消费者对商品价值认知的困惑。核心争议点在于：高价是否真正对应品质提升（如品种、产地、种植技术、安全标准），还是主要受品牌溢价、营销包装或心理因素驱动。话题延伸至消费主义、智商税讨论，以及如何理性辨别商品真实价值。这体现了大众在信息不对称市场中对透明、可信赖消费指导的需求。</p>
+                    </div>
+
+                    <div class="creative-section">
+                        <h4>产品创意 (AI/软件)</h4>
+                        <div class="creative-grid">
+                            
+                    <div class="creative-card excellent">
+                        <div class="creative-header">
+                            <h3 class="creative-name">AI识价精灵</h3>
+                            <span class="quality-badge badge-excellent">优秀</span>
+                        </div>
+                        <div class="creative-features">
+                            <ul><li>手机拍照识别商品（如水果、食材），AI分析外观、品种、产地等特征</li>
+<li>基于大数据实时比对市场行情，给出合理价格区间与溢价因素解析</li>
+<li>提供同类商品横向对比与性价比评分</li></ul>
+                        </div>
+                        <div class="target-users">
+                            <strong>目标用户:</strong> 注重性价比的消费者、对商品品质有疑虑的购物者、生活经验较少的年轻人
+                        </div>
+                        <div class="score-section">
+                            <div class="score-breakdown">
+                                <div class="score-bar">
+                                    <div class="score-fill score-fill-interest" style="width: 80%"></div>
+                                </div>
+                                <span>有趣度: 80/100</span>
+                            </div>
+                            <div class="score-breakdown">
+                                <div class="score-bar">
+                                    <div class="score-fill score-fill-useful" style="width: 90%"></div>
+                                </div>
+                                <span>有用度: 90/100</span>
+                            </div>
+                            <div class="total-score">综合评分: 82.0/100</div>
+                        </div>
+                    </div>
+                    
+                    <div class="creative-card excellent">
+                        <div class="creative-header">
+                            <h3 class="creative-name">虚拟味觉实验室</h3>
+                            <span class="quality-badge badge-excellent">优秀</span>
+                        </div>
+                        <div class="creative-features">
+                            <ul><li>基于商品成分、用户评价等数据，AI生成模拟的‘风味描述报告’与‘心理预期体验评分’</li>
+<li>用户可输入预算，AI推荐不同价位下的‘风味体验最优解’</li>
+<li>设有‘盲测挑战’小游戏，猜测商品价格区间，增加互动娱乐性</li></ul>
+                        </div>
+                        <div class="target-users">
+                            <strong>目标用户:</strong> 美食爱好者、喜欢尝试新事物但预算有限的用户、对消费心理学感兴趣的人群
+                        </div>
+                        <div class="score-section">
+                            <div class="score-breakdown">
+                                <div class="score-bar">
+                                    <div class="score-fill score-fill-interest" style="width: 90%"></div>
+                                </div>
+                                <span>有趣度: 90/100</span>
+                            </div>
+                            <div class="score-breakdown">
+                                <div class="score-bar">
+                                    <div class="score-fill score-fill-useful" style="width: 75%"></div>
+                                </div>
+                                <span>有用度: 75/100</span>
+                            </div>
+                            <div class="total-score">综合评分: 87.0/100</div>
+                        </div>
+                    </div>
+                    
+                        </div>
+                    </div>
+                </section>
+                
+                <section class="topic-section">
+                    <div class="topic-header">
+                        <span class="topic-rank">2</span>
+                        <div style="flex-grow: 1;">
+                            <h2 class="topic-title">男子献血2.2万毫升景区不免票被告</h2>
+                            <span class="topic-label"></span>
+                            <span class="hot-value">🔥 775343</span>
+                        </div>
+                    </div>
+
+                    <div class="summary-section">
+                        <h4>热点详细信息</h4>
+                        <p>近日，一名累计献血2.2万毫升的男子在景区要求免票被拒后，将景区告上法庭。该男子持有《无偿献血荣誉证》，但景区以“非本地政策”为由拒绝。事件引发公众对献血者权益保障、地方政策执行差异及社会诚信体系建设的广泛讨论。网友普遍支持献血者维权，认为其善举应得到社会认可与回馈，同时呼吁建立全国统一的献血激励与权益保障机制。</p>
+                    </div>
+
+                    <div class="creative-section">
+                        <h4>产品创意 (AI/软件)</h4>
+                        <div class="creative-grid">
+                            
+                    <div class="creative-card good">
+                        <div class="creative-header">
+                            <h3 class="creative-name">善行通AI权益助手</h3>
+                            <span class="quality-badge badge-good">良好</span>
+                        </div>
+                        <div class="creative-features">
+                            <ul><li>全国政策智能匹配：基于用户位置与善行记录（如献血量、志愿服务时长），实时推送可享受的本地优惠政策</li>
+<li>权益争议AI调解：通过自然语言处理分析用户与商家的沟通记录，提供协商话术建议或自动生成投诉材料</li>
+<li>善行积分区块链存证：将用户公益行为上链，生成不可篡改的电子凭证，解决跨地区认证难题</li></ul>
+                        </div>
+                        <div class="target-users">
+                            <strong>目标用户:</strong> 长期参与献血、志愿服务等公益活动的群体，及关注权益保障的普通市民
+                        </div>
+                        <div class="score-section">
+                            <div class="score-breakdown">
+                                <div class="score-bar">
+                                    <div class="score-fill score-fill-interest" style="width: 75%"></div>
+                                </div>
+                                <span>有趣度: 75/100</span>
+                            </div>
+                            <div class="score-breakdown">
+                                <div class="score-bar">
+                                    <div class="score-fill score-fill-useful" style="width: 90%"></div>
+                                </div>
+                                <span>有用度: 90/100</span>
+                            </div>
+                            <div class="total-score">综合评分: 78.0/100</div>
+                        </div>
+                    </div>
+                    
+                    <div class="creative-card excellent">
+                        <div class="creative-header">
+                            <h3 class="creative-name">热搜法庭AI模拟器</h3>
+                            <span class="quality-badge badge-excellent">优秀</span>
+                        </div>
+                        <div class="creative-features">
+                            <ul><li>争议事件剧本生成：基于实时热搜话题（如本次献血免票争议），自动生成原被告立场、证据链与法律条文参考</li>
+<li>AI角色辩论对抗：用户可选择扮演原告、被告或法官，与AI进行模拟法庭辩论，系统实时评估论点合理性</li>
+<li>舆情共识可视化：分析模拟判决结果与全网舆论倾向的差异，生成‘法律与民意’对比报告</li></ul>
+                        </div>
+                        <div class="target-users">
+                            <strong>目标用户:</strong> 对社会热点感兴趣的年轻网民、法律爱好者及普法教育群体
+                        </div>
+                        <div class="score-section">
+                            <div class="score-breakdown">
+                                <div class="score-bar">
+                                    <div class="score-fill score-fill-interest" style="width: 95%"></div>
+                                </div>
+                                <span>有趣度: 95/100</span>
+                            </div>
+                            <div class="score-breakdown">
+                                <div class="score-bar">
+                                    <div class="score-fill score-fill-useful" style="width: 65%"></div>
+                                </div>
+                                <span>有用度: 65/100</span>
+                            </div>
+                            <div class="total-score">综合评分: 89.0/100</div>
+                        </div>
+                    </div>
+                    
+                        </div>
+                    </div>
+                </section>
+                
+                <section class="topic-section">
+                    <div class="topic-header">
+                        <span class="topic-rank">3</span>
+                        <div style="flex-grow: 1;">
+                            <h2 class="topic-title">五个新概括2025年经济工作成绩单</h2>
+                            <span class="topic-label"></span>
+                            <span class="hot-value">🔥 629075</span>
+                        </div>
+                    </div>
+
+                    <div class="summary-section">
+                        <h4>热点详细信息</h4>
+                        <p>2026年1月21日，微博热搜话题“五个新概括2025年经济工作成绩单”引发广泛关注。该话题源于近期官方发布的2025年经济工作总结，用“五个新”系统概括了全年经济工作亮点：新动能加速成长、新质生产力显著提升、新消费模式蓬勃发展、新开放格局持续深化、新安全屏障更加牢固。这反映了中国在科技创新、产业升级、消费提振、高水平开放及风险防控等方面的积极进展，为公众理解宏观经济走向提供了清晰框架，也体现了政策层面对高质量发展的高度重视。</p>
+                    </div>
+
+                    <div class="creative-section">
+                        <h4>产品创意 (AI/软件)</h4>
+                        <div class="creative-grid">
+                            
+                    <div class="creative-card good">
+                        <div class="creative-header">
+                            <h3 class="creative-name">经济脉搏AI助手</h3>
+                            <span class="quality-badge badge-good">良好</span>
+                        </div>
+                        <div class="creative-features">
+                            <ul><li>基于‘五个新’框架的个性化经济数据可视化看板</li>
+<li>AI驱动的宏观经济趋势解读与投资机会挖掘</li>
+<li>实时政策热点追踪与影响分析报告生成</li></ul>
+                        </div>
+                        <div class="target-users">
+                            <strong>目标用户:</strong> 投资者、企业管理者、经济研究者及对宏观经济感兴趣的公众
+                        </div>
+                        <div class="score-section">
+                            <div class="score-breakdown">
+                                <div class="score-bar">
+                                    <div class="score-fill score-fill-interest" style="width: 75%"></div>
+                                </div>
+                                <span>有趣度: 75/100</span>
+                            </div>
+                            <div class="score-breakdown">
+                                <div class="score-bar">
+                                    <div class="score-fill score-fill-useful" style="width: 90%"></div>
+                                </div>
+                                <span>有用度: 90/100</span>
+                            </div>
+                            <div class="total-score">综合评分: 78.0/100</div>
+                        </div>
+                    </div>
+                    
+                    <div class="creative-card excellent">
+                        <div class="creative-header">
+                            <h3 class="creative-name">未来经济模拟器</h3>
+                            <span class="quality-badge badge-excellent">优秀</span>
+                        </div>
+                        <div class="creative-features">
+                            <ul><li>基于‘五个新’等宏观变量的AI经济沙盘游戏</li>
+<li>用户政策选择模拟及长期经济影响预测</li>
+<li>多人协作模式与经济策略排行榜</li></ul>
+                        </div>
+                        <div class="target-users">
+                            <strong>目标用户:</strong> 学生、经济爱好者、教育工作者及策略游戏玩家
+                        </div>
+                        <div class="score-section">
+                            <div class="score-breakdown">
+                                <div class="score-bar">
+                                    <div class="score-fill score-fill-interest" style="width: 88%"></div>
+                                </div>
+                                <span>有趣度: 88/100</span>
+                            </div>
+                            <div class="score-breakdown">
+                                <div class="score-bar">
+                                    <div class="score-fill score-fill-useful" style="width: 65%"></div>
+                                </div>
+                                <span>有用度: 65/100</span>
+                            </div>
+                            <div class="total-score">综合评分: 83.4/100</div>
+                        </div>
+                    </div>
+                    
+                        </div>
+                    </div>
+                </section>
+                
+                <section class="topic-section">
+                    <div class="topic-header">
+                        <span class="topic-rank">4</span>
+                        <div style="flex-grow: 1;">
+                            <h2 class="topic-title">车厘子降价后黑草莓成水果新贵</h2>
+                            <span class="topic-label"></span>
+                            <span class="hot-value">🔥 617696</span>
+                        </div>
+                    </div>
+
+                    <div class="summary-section">
+                        <h4>热点详细信息</h4>
+                        <p>近期车厘子价格大幅下降，而黑草莓因其独特风味和稀缺性成为市场新宠，价格飙升。这一现象反映了消费者对高品质、新奇水果的追求，以及水果市场的快速轮动趋势。社交媒体上关于黑草莓的讨论热度高涨，用户关注其口感、营养价值及购买渠道，同时也对水果价格波动和消费趋势变化表现出浓厚兴趣。</p>
+                    </div>
+
+                    <div class="creative-section">
+                        <h4>产品创意 (AI/软件)</h4>
+                        <div class="creative-grid">
+                            
+                    <div class="creative-card excellent">
+                        <div class="creative-header">
+                            <h3 class="creative-name">果市先知AI</h3>
+                            <span class="quality-badge badge-excellent">优秀</span>
+                        </div>
+                        <div class="creative-features">
+                            <ul><li>基于实时市场数据预测水果价格趋势</li>
+<li>个性化水果消费推荐与比价</li>
+<li>AI生成水果营养搭配与食谱</li></ul>
+                        </div>
+                        <div class="target-users">
+                            <strong>目标用户:</strong> 注重生活品质的年轻消费者、家庭采购者、美食爱好者
+                        </div>
+                        <div class="score-section">
+                            <div class="score-breakdown">
+                                <div class="score-bar">
+                                    <div class="score-fill score-fill-interest" style="width: 80%"></div>
+                                </div>
+                                <span>有趣度: 80/100</span>
+                            </div>
+                            <div class="score-breakdown">
+                                <div class="score-bar">
+                                    <div class="score-fill score-fill-useful" style="width: 85%"></div>
+                                </div>
+                                <span>有用度: 85/100</span>
+                            </div>
+                            <div class="total-score">综合评分: 81.0/100</div>
+                        </div>
+                    </div>
+                    
+                    <div class="creative-card excellent">
+                        <div class="creative-header">
+                            <h3 class="creative-name">水果猎人AR</h3>
+                            <span class="quality-badge badge-excellent">优秀</span>
+                        </div>
+                        <div class="creative-features">
+                            <ul><li>AR扫描识别水果品种与产地</li>
+<li>AI生成虚拟水果种植互动游戏</li>
+<li>社交分享水果发现与评测</li></ul>
+                        </div>
+                        <div class="target-users">
+                            <strong>目标用户:</strong> 喜欢尝试新奇水果的年轻人、亲子家庭、水果爱好者
+                        </div>
+                        <div class="score-section">
+                            <div class="score-breakdown">
+                                <div class="score-bar">
+                                    <div class="score-fill score-fill-interest" style="width: 90%"></div>
+                                </div>
+                                <span>有趣度: 90/100</span>
+                            </div>
+                            <div class="score-breakdown">
+                                <div class="score-bar">
+                                    <div class="score-fill score-fill-useful" style="width: 70%"></div>
+                                </div>
+                                <span>有用度: 70/100</span>
+                            </div>
+                            <div class="total-score">综合评分: 86.0/100</div>
+                        </div>
+                    </div>
+                    
+                        </div>
+                    </div>
+                </section>
+                
+                <section class="topic-section">
+                    <div class="topic-header">
+                        <span class="topic-rank">5</span>
+                        <div style="flex-grow: 1;">
+                            <h2 class="topic-title">涉密单位搬迁打印机被拉到废品站</h2>
+                            <span class="topic-label"></span>
+                            <span class="hot-value">🔥 551303</span>
+                        </div>
+                    </div>
+
+                    <div class="summary-section">
+                        <h4>热点详细信息</h4>
+                        <p>2026年1月21日，微博热搜话题“涉密单位搬迁打印机被拉到废品站”引发关注。事件核心是某涉密单位在搬迁过程中，一台存有敏感信息的打印机被误当作普通废品处理，流入废品回收站。这暴露了涉密单位在设备报废、数据销毁流程中的管理漏洞，以及员工保密意识薄弱的问题。事件迅速发酵，反映了公众对国家机关和企事业单位信息安全管理能力的担忧，也警示了任何组织都需建立严格的涉密载体全生命周期管理制度，防止因疏忽导致泄密风险。</p>
+                    </div>
+
+                    <div class="creative-section">
+                        <h4>产品创意 (AI/软件)</h4>
+                        <div class="creative-grid">
+                            
+                    <div class="creative-card good">
+                        <div class="creative-header">
+                            <h3 class="creative-name">密盾AI - 涉密载体智能追踪与销毁审计系统</h3>
+                            <span class="quality-badge badge-good">良好</span>
+                        </div>
+                        <div class="creative-features">
+                            <ul><li>基于计算机视觉与NLP的涉密载体（如打印机、硬盘）自动识别与登记</li>
+<li>集成区块链技术，为每个涉密载体生成不可篡改的‘数字护照’，记录其从采购、使用、维修到报废的全生命周期轨迹</li>
+<li>AI风险预警：当载体即将离开安全区域或进入报废流程时，自动检测其内部是否残留敏感数据，并触发多重审批与物理销毁确认流程</li></ul>
+                        </div>
+                        <div class="target-users">
+                            <strong>目标用户:</strong> 政府机关、军工单位、金融机构、大型企业等拥有高保密需求机构的IT与安全管理部门
+                        </div>
+                        <div class="score-section">
+                            <div class="score-breakdown">
+                                <div class="score-bar">
+                                    <div class="score-fill score-fill-interest" style="width: 75%"></div>
+                                </div>
+                                <span>有趣度: 75/100</span>
+                            </div>
+                            <div class="score-breakdown">
+                                <div class="score-bar">
+                                    <div class="score-fill score-fill-useful" style="width: 95%"></div>
+                                </div>
+                                <span>有用度: 95/100</span>
+                            </div>
+                            <div class="total-score">综合评分: 79.0/100</div>
+                        </div>
+                    </div>
+                    
+                    <div class="creative-card excellent">
+                        <div class="creative-header">
+                            <h3 class="creative-name">废品猎人 - AI增强型电子废品风险扫描仪（Web应用）</h3>
+                            <span class="quality-badge badge-excellent">优秀</span>
+                        </div>
+                        <div class="creative-features">
+                            <ul><li>用户（如废品站员工、环保爱好者）上传电子废品（如旧手机、电脑、打印机）照片，AI模型快速识别设备型号并评估其潜在数据泄露风险等级</li>
+<li>模拟数据恢复攻击：基于公开漏洞库，AI模拟演示该设备若未妥善处理，可能被提取出哪些类型的信息（如通讯录、文档碎片等），生成可视化报告</li>
+<li>一键生成‘安全处置指南’：根据设备类型和风险等级，提供具体的物理破坏建议、官方回收渠道或专业数据销毁服务推荐</li></ul>
+                        </div>
+                        <div class="target-users">
+                            <strong>目标用户:</strong> 废品回收行业从业者、注重隐私保护的普通个人、社区环保组织、中小企业行政人员
+                        </div>
+                        <div class="score-section">
+                            <div class="score-breakdown">
+                                <div class="score-bar">
+                                    <div class="score-fill score-fill-interest" style="width: 90%"></div>
+                                </div>
+                                <span>有趣度: 90/100</span>
+                            </div>
+                            <div class="score-breakdown">
+                                <div class="score-bar">
+                                    <div class="score-fill score-fill-useful" style="width: 80%"></div>
+                                </div>
+                                <span>有用度: 80/100</span>
+                            </div>
+                            <div class="total-score">综合评分: 88.0/100</div>
+                        </div>
+                    </div>
+                    
+                        </div>
+                    </div>
+                </section>
+                
+            </div>
+            
+
             <div class="data-batch" data-hour="2026-01-21 15:00">
                 <div class="batch-header" style="margin: 2rem 0; padding-bottom: 0.5rem; border-bottom: 2px solid #e5e7eb;">
                     <h2 style="color: #4b5563;">数据时间: 2026-01-21 15:41:02</h2>
@@ -485,13 +909,8 @@
                         <div style="flex-grow: 1;">
                             <h2 class="topic-title">10元一斤草莓和300元一斤草莓区别</h2>
                             <span class="topic-label"></span>
-                            <span class="hot-value">1099816</span>
+                            <span class="hot-value">🔥 1099816</span>
                         </div>
-                    </div>
-
-                    <div class="timeline-section">
-                        <h4>事件脉络</h4>
-                        <ul class="timeline-list"></ul>
                     </div>
 
                     <div class="summary-section">
@@ -575,13 +994,8 @@
                         <div style="flex-grow: 1;">
                             <h2 class="topic-title">男子献血2.2万毫升景区不免票被告</h2>
                             <span class="topic-label"></span>
-                            <span class="hot-value">819129</span>
+                            <span class="hot-value">🔥 819129</span>
                         </div>
-                    </div>
-
-                    <div class="timeline-section">
-                        <h4>事件脉络</h4>
-                        <ul class="timeline-list"></ul>
                     </div>
 
                     <div class="summary-section">
@@ -663,13 +1077,8 @@
                         <div style="flex-grow: 1;">
                             <h2 class="topic-title">五个新概括2025年经济工作成绩单</h2>
                             <span class="topic-label"></span>
-                            <span class="hot-value">718671</span>
+                            <span class="hot-value">🔥 718671</span>
                         </div>
-                    </div>
-
-                    <div class="timeline-section">
-                        <h4>事件脉络</h4>
-                        <ul class="timeline-list"></ul>
                     </div>
 
                     <div class="summary-section">
@@ -751,13 +1160,8 @@
                         <div style="flex-grow: 1;">
                             <h2 class="topic-title">车厘子降价后黑草莓成水果新贵</h2>
                             <span class="topic-label"></span>
-                            <span class="hot-value">699785</span>
+                            <span class="hot-value">🔥 699785</span>
                         </div>
-                    </div>
-
-                    <div class="timeline-section">
-                        <h4>事件脉络</h4>
-                        <ul class="timeline-list"></ul>
                     </div>
 
                     <div class="summary-section">
@@ -839,13 +1243,8 @@
                         <div style="flex-grow: 1;">
                             <h2 class="topic-title">王昭君新皮肤长夜焕生</h2>
                             <span class="topic-label"></span>
-                            <span class="hot-value">370707</span>
+                            <span class="hot-value">🔥 370707</span>
                         </div>
-                    </div>
-
-                    <div class="timeline-section">
-                        <h4>事件脉络</h4>
-                        <ul class="timeline-list"></ul>
                     </div>
 
                     <div class="summary-section">
@@ -935,13 +1334,8 @@
                         <div style="flex-grow: 1;">
                             <h2 class="topic-title">10元一斤草莓和300元一斤草莓区别</h2>
                             <span class="topic-label"></span>
-                            <span class="hot-value">1086993</span>
+                            <span class="hot-value">🔥 1086993</span>
                         </div>
-                    </div>
-
-                    <div class="timeline-section">
-                        <h4>事件脉络</h4>
-                        <ul class="timeline-list"></ul>
                     </div>
 
                     <div class="summary-section">
@@ -1023,13 +1417,8 @@
                         <div style="flex-grow: 1;">
                             <h2 class="topic-title">男子献血2.2万毫升景区不免票被告</h2>
                             <span class="topic-label"></span>
-                            <span class="hot-value">803783</span>
+                            <span class="hot-value">🔥 803783</span>
                         </div>
-                    </div>
-
-                    <div class="timeline-section">
-                        <h4>事件脉络</h4>
-                        <ul class="timeline-list"></ul>
                     </div>
 
                     <div class="summary-section">
@@ -1111,13 +1500,8 @@
                         <div style="flex-grow: 1;">
                             <h2 class="topic-title">五个新概括2025年经济工作成绩单</h2>
                             <span class="topic-label"></span>
-                            <span class="hot-value">620842</span>
+                            <span class="hot-value">🔥 620842</span>
                         </div>
-                    </div>
-
-                    <div class="timeline-section">
-                        <h4>事件脉络</h4>
-                        <ul class="timeline-list"></ul>
                     </div>
 
                     <div class="summary-section">
@@ -1199,13 +1583,8 @@
                         <div style="flex-grow: 1;">
                             <h2 class="topic-title">山上彻也哥哥自杀后萌生报复念头</h2>
                             <span class="topic-label"></span>
-                            <span class="hot-value">534325</span>
+                            <span class="hot-value">🔥 534325</span>
                         </div>
-                    </div>
-
-                    <div class="timeline-section">
-                        <h4>事件脉络</h4>
-                        <ul class="timeline-list"></ul>
                     </div>
 
                     <div class="summary-section">
@@ -1287,13 +1666,8 @@
                         <div style="flex-grow: 1;">
                             <h2 class="topic-title">王昭君新皮肤长夜焕生</h2>
                             <span class="topic-label"></span>
-                            <span class="hot-value">414580</span>
+                            <span class="hot-value">🔥 414580</span>
                         </div>
-                    </div>
-
-                    <div class="timeline-section">
-                        <h4>事件脉络</h4>
-                        <ul class="timeline-list"></ul>
                     </div>
 
                     <div class="summary-section">
@@ -1385,13 +1759,8 @@
                         <div style="flex-grow: 1;">
                             <h2 class="topic-title">10元一斤草莓和300元一斤草莓区别</h2>
                             <span class="topic-label"></span>
-                            <span class="hot-value">1086993</span>
+                            <span class="hot-value">🔥 1086993</span>
                         </div>
-                    </div>
-
-                    <div class="timeline-section">
-                        <h4>事件脉络</h4>
-                        <ul class="timeline-list"></ul>
                     </div>
 
                     <div class="summary-section">
@@ -1473,13 +1842,8 @@
                         <div style="flex-grow: 1;">
                             <h2 class="topic-title">男子献血2.2万毫升景区不免票被告</h2>
                             <span class="topic-label"></span>
-                            <span class="hot-value">803783</span>
+                            <span class="hot-value">🔥 803783</span>
                         </div>
-                    </div>
-
-                    <div class="timeline-section">
-                        <h4>事件脉络</h4>
-                        <ul class="timeline-list"></ul>
                     </div>
 
                     <div class="summary-section">
@@ -1561,13 +1925,8 @@
                         <div style="flex-grow: 1;">
                             <h2 class="topic-title">五个新概括2025年经济工作成绩单</h2>
                             <span class="topic-label"></span>
-                            <span class="hot-value">620842</span>
+                            <span class="hot-value">🔥 620842</span>
                         </div>
-                    </div>
-
-                    <div class="timeline-section">
-                        <h4>事件脉络</h4>
-                        <ul class="timeline-list"></ul>
                     </div>
 
                     <div class="summary-section">
@@ -1647,13 +2006,8 @@
                         <div style="flex-grow: 1;">
                             <h2 class="topic-title">山上彻也哥哥自杀后萌生报复念头</h2>
                             <span class="topic-label"></span>
-                            <span class="hot-value">534325</span>
+                            <span class="hot-value">🔥 534325</span>
                         </div>
-                    </div>
-
-                    <div class="timeline-section">
-                        <h4>事件脉络</h4>
-                        <ul class="timeline-list"></ul>
                     </div>
 
                     <div class="summary-section">
@@ -1737,13 +2091,8 @@
                         <div style="flex-grow: 1;">
                             <h2 class="topic-title">王昭君新皮肤长夜焕生</h2>
                             <span class="topic-label"></span>
-                            <span class="hot-value">414580</span>
+                            <span class="hot-value">🔥 414580</span>
                         </div>
-                    </div>
-
-                    <div class="timeline-section">
-                        <h4>事件脉络</h4>
-                        <ul class="timeline-list"></ul>
                     </div>
 
                     <div class="summary-section">
@@ -1843,20 +2192,20 @@
             <h3>推荐优先级</h3>
             
             <div class="recommendation-item">
-                <h4>1. 热点经济学人 (综合评分: 87.0)</h4>
-                <p>来自话题: 五个新概括2025年经济工作成绩单</p>
+                <h4>1. 热搜法庭AI模拟器 (综合评分: 89.0)</h4>
+                <p>来自话题: 男子献血2.2万毫升景区不免票被告</p>
             </div>
             
 
             <div class="recommendation-item">
-                <h4>2. AI皮肤试妆与风格迁移助手 (综合评分: 87.0)</h4>
-                <p>来自话题: 王昭君新皮肤长夜焕生</p>
+                <h4>2. 废品猎人 - AI增强型电子废品风险扫描仪（Web应用） (综合评分: 88.0)</h4>
+                <p>来自话题: 涉密单位搬迁打印机被拉到废品站</p>
             </div>
             
 
             <div class="recommendation-item">
-                <h4>3. AI水果美学馆 (综合评分: 85.0)</h4>
-                <p>来自话题: 车厘子降价后黑草莓成水果新贵</p>
+                <h4>3. 虚拟味觉实验室 (综合评分: 87.0)</h4>
+                <p>来自话题: 10元一斤草莓和300元一斤草莓区别</p>
             </div>
             </section>
 

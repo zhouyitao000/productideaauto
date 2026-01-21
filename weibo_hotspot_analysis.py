@@ -144,7 +144,7 @@ class WeiboHotspotAnalyzer:
         {search_context}
         
         任务:
-        1. 总结事件脉络和关键细节（注意：请根据当前日期 {current_date_str} 准确推断事件发生的时间。严格要求：只展示在搜索结果中明确提到的时间点。如果搜索结果中没有提及具体时间，请不要进行推断或编造，直接忽略该时间点）。
+        1. 总结事件关键细节（150字左右）。
         2. 基于该话题生成2个产品创意。
            **重要限制**: 创意必须是 **软件产品 (App/Web)**、**AI应用** 或 **AI解决方案**。不接受实体产品或纯营销活动。
            创意应侧重于如何利用 AI 技术解决用户痛点或提供娱乐价值。
@@ -153,7 +153,6 @@ class WeiboHotspotAnalyzer:
         输出格式 (仅JSON):
         {{
             "research": {{
-                "timeline": ["日期: 事件", ...],
                 "summary": "综合摘要 (150字左右)"
             }},
             "creatives": [
@@ -203,7 +202,7 @@ class WeiboHotspotAnalyzer:
 
             return {
                 "topic": topic,
-                "research": llm_result.get("research", {"timeline": [], "summary": "分析失败"}),
+                "research": llm_result.get("research", {"summary": "分析失败"}),
                 "creatives": creatives
             }
             
@@ -241,14 +240,21 @@ class WeiboHotspotAnalyzer:
         
         # Add to history
         current_time = datetime.now()
+        timestamp_hour = current_time.strftime("%Y-%m-%d %H:00")
         batch_entry = {
             "timestamp": current_time.strftime("%Y-%m-%d %H:%M:%S"),
-            "timestamp_hour": current_time.strftime("%Y-%m-%d %H:00"),
+            "timestamp_hour": timestamp_hour,
             "results": results
         }
         
-        # Prepend new batch (newest first)
-        self.history_data.insert(0, batch_entry)
+        # Overwrite if same hour exists (latest update), else prepend
+        if self.history_data and self.history_data[0].get("timestamp_hour") == timestamp_hour:
+             print(f"Updating existing data for hour: {timestamp_hour}")
+             self.history_data[0] = batch_entry
+        else:
+             print(f"Adding new data for hour: {timestamp_hour}")
+             self.history_data.insert(0, batch_entry)
+
         # Keep only last 24 batches (24 hours) to avoid file getting too large
         self.history_data = self.history_data[:24]
         
@@ -306,7 +312,7 @@ class WeiboHotspotAnalyzer:
                 research = result["research"]
                 creatives = result["creatives"]
 
-                timeline_html = "\n".join(f'<li>{e}</li>' for e in research.get("timeline", []))
+                timeline_html = "" # Removed timeline
                 
                 creatives_html = []
                 for creative in creatives:
@@ -352,13 +358,8 @@ class WeiboHotspotAnalyzer:
                         <div style="flex-grow: 1;">
                             <h2 class="topic-title">{topic['title']}</h2>
                             <span class="topic-label">{topic['label']}</span>
-                            <span class="hot-value">{topic['hot_value']}</span>
+                            <span class="hot-value">🔥 {topic['hot_value']}</span>
                         </div>
-                    </div>
-
-                    <div class="timeline-section">
-                        <h4>事件脉络</h4>
-                        <ul class="timeline-list">{timeline_html}</ul>
                     </div>
 
                     <div class="summary-section">
