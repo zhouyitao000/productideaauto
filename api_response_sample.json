@@ -1,0 +1,33 @@
+{
+  "code": 200,
+  "msg": "success",
+  "result": {
+    "list": [
+      {
+        "hotword": "猫的树太会拍了",
+        "hotwordnum": "剧集 1040626",
+        "hottag": ""
+      },
+      {
+        "hotword": "警方通报中山一货车碰撞多车",
+        "hotwordnum": " 861165",
+        "hottag": "新"
+      },
+      {
+        "hotword": "中国GDP跨越140万亿元关口",
+        "hotwordnum": " 574364",
+        "hottag": ""
+      },
+      {
+        "hotword": "蔡徐坤印尼节目",
+        "hotwordnum": " 317040",
+        "hottag": ""
+      },
+      {
+        "hotword": "人民日报评美国斩杀线",
+        "hotwordnum": " 252742",
+        "hottag": ""
+      }
+    ]
+  }
+}

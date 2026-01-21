@@ -1,0 +1,551 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- 页面每隔 3600 秒 (1小时) 自动刷新一次，以显示最新数据 -->
+    <meta http-equiv="refresh" content="3600">
+    <title>微博热搜产品创意分析报告</title>
+    <style>
+        /* 简约专业风格 - Simple professional style */
+        :root {
+            --color-excellent: #10b981; /* Green */
+            --color-good: #f59e0b; /* Yellow */
+            --color-needs-improvement: #ef4444; /* Red */
+            --color-background: #f9fafb;
+            --color-surface: #ffffff;
+            --color-text: #111827;
+            --color-text-secondary: #6b7280;
+            --color-border: #e5e7eb;
+            --spacing-unit: 1rem;
+            --border-radius: 0.5rem;
+            --shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
+            --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Helvetica Neue', Arial, sans-serif;
+            line-height: 1.6;
+            color: var(--color-text);
+            background-color: var(--color-background);
+            padding: var(--spacing-unit);
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .container {
+            display: flex;
+            flex-direction: column;
+            gap: 2rem;
+        }
+
+        /* Header */
+        .header {
+            background-color: var(--color-surface);
+            padding: 2rem;
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow);
+            text-align: center;
+            border-top: 4px solid var(--color-excellent);
+        }
+
+        .header h1 {
+            font-size: 2rem;
+            margin-bottom: 0.5rem;
+            color: var(--color-text);
+        }
+
+        .header .subtitle {
+            color: var(--color-text-secondary);
+            font-size: 1rem;
+        }
+
+        .header .metadata {
+            display: flex;
+            justify-content: center;
+            gap: 2rem;
+            margin-top: 1.5rem;
+            font-size: 0.9rem;
+            color: var(--color-text-secondary);
+        }
+
+        /* Summary Cards */
+        .summary-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .summary-card {
+            background-color: var(--color-surface);
+            padding: 1.5rem;
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow);
+            border-left: 4px solid var(--color-excellent);
+        }
+
+        .summary-card h3 {
+            font-size: 1.1rem;
+            margin-bottom: 1rem;
+            color: var(--color-text);
+        }
+
+        .summary-card .value {
+            font-size: 2rem;
+            font-weight: bold;
+            color: var(--color-text);
+        }
+
+        .summary-card .label {
+            font-size: 0.9rem;
+            color: var(--color-text-secondary);
+            margin-top: 0.25rem;
+        }
+
+        /* Topic Section */
+        .topic-section {
+            background-color: var(--color-surface);
+            padding: 2rem;
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow);
+            margin-bottom: 2rem;
+        }
+
+        .topic-header {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid var(--color-border);
+        }
+
+        .topic-rank {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 2.5rem;
+            height: 2.5rem;
+            background-color: var(--color-excellent);
+            color: white;
+            border-radius: 50%;
+            font-weight: bold;
+            font-size: 1.2rem;
+        }
+
+        .topic-title {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: var(--color-text);
+        }
+
+        .topic-label {
+            display: inline-block;
+            padding: 0.25rem 0.75rem;
+            background-color: var(--color-border);
+            border-radius: 1rem;
+            font-size: 0.8rem;
+            font-weight: 500;
+            color: var(--color-text-secondary);
+        }
+
+        .hot-value {
+            margin-left: auto;
+            font-weight: bold;
+            color: var(--color-text);
+        }
+
+        /* Timeline */
+        .timeline-section h4, .summary-section h4, .creative-section h4 {
+            font-size: 1.2rem;
+            margin-bottom: 1rem;
+            color: var(--color-text);
+            padding-bottom: 0.5rem;
+            border-bottom: 1px solid var(--color-border);
+        }
+
+        .timeline-list {
+            list-style-type: none;
+            padding-left: 0;
+        }
+
+        .timeline-list li {
+            position: relative;
+            padding-left: 1.5rem;
+            margin-bottom: 0.75rem;
+            color: var(--color-text-secondary);
+        }
+
+        .timeline-list li:before {
+            content: "•";
+            position: absolute;
+            left: 0;
+            color: var(--color-excellent);
+            font-size: 1.5rem;
+            line-height: 1;
+        }
+
+        /* Creative Cards */
+        .creative-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 1.5rem;
+            margin-top: 1.5rem;
+        }
+
+        .creative-card {
+            background-color: var(--color-surface);
+            padding: 1.5rem;
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow);
+            border-top: 4px solid var(--color-excellent);
+        }
+
+        .creative-card.good {
+            border-top-color: var(--color-good);
+        }
+
+        .creative-card.needs-improvement {
+            border-top-color: var(--color-needs-improvement);
+        }
+
+        .creative-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 1rem;
+        }
+
+        .creative-name {
+            font-size: 1.25rem;
+            font-weight: bold;
+            color: var(--color-text);
+        }
+
+        .quality-badge {
+            display: inline-block;
+            padding: 0.25rem 0.75rem;
+            border-radius: 1rem;
+            font-size: 0.8rem;
+            font-weight: 600;
+            color: white;
+        }
+
+        .badge-excellent {
+            background-color: var(--color-excellent);
+        }
+
+        .badge-good {
+            background-color: var(--color-good);
+        }
+
+        .badge-needs-improvement {
+            background-color: var(--color-needs-improvement);
+        }
+
+        .creative-features {
+            margin-top: 1rem;
+        }
+
+        .creative-features ul {
+            list-style-type: none;
+            padding-left: 0;
+        }
+
+        .creative-features li {
+            padding-left: 1.5rem;
+            position: relative;
+            margin-bottom: 0.5rem;
+            color: var(--color-text-secondary);
+        }
+
+        .creative-features li:before {
+            content: "✓";
+            position: absolute;
+            left: 0;
+            color: var(--color-excellent);
+            font-weight: bold;
+        }
+
+        .score-section {
+            margin-top: 1.5rem;
+            padding-top: 1rem;
+            border-top: 1px solid var(--color-border);
+        }
+
+        .score-breakdown {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-top: 0.75rem;
+        }
+
+        .score-bar {
+            flex-grow: 1;
+            height: 8px;
+            background-color: var(--color-border);
+            border-radius: 4px;
+            overflow: hidden;
+        }
+
+        .score-fill {
+            height: 100%;
+            border-radius: 4px;
+        }
+
+        .score-fill-interest {
+            background-color: var(--color-excellent);
+            width: 80%; /* Placeholder for interesting score */
+        }
+
+        .score-fill-useful {
+            background-color: var(--color-good);
+            width: 20%; /* Placeholder for useful score */
+        }
+
+        .score-labels {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 0.5rem;
+            font-size: 0.85rem;
+            color: var(--color-text-secondary);
+        }
+
+        .total-score {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: var(--color-text);
+            text-align: right;
+            margin-top: 0.5rem;
+        }
+
+        /* Recommendations */
+        .recommendations {
+            background-color: var(--color-surface);
+            padding: 2rem;
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow);
+            border-left: 4px solid var(--color-excellent);
+        }
+
+        .recommendations h3 {
+            font-size: 1.5rem;
+            margin-bottom: 1.5rem;
+            color: var(--color-text);
+        }
+
+        .recommendation-item {
+            padding: 1rem;
+            background-color: var(--color-background);
+            border-radius: var(--border-radius);
+            margin-bottom: 1rem;
+            border-left: 3px solid var(--color-excellent);
+        }
+
+        .recommendation-item h4 {
+            font-size: 1.1rem;
+            color: var(--color-text);
+            margin-bottom: 0.5rem;
+        }
+
+        /* Footer */
+        .footer {
+            text-align: center;
+            padding: 2rem;
+            color: var(--color-text-secondary);
+            font-size: 0.9rem;
+            border-top: 1px solid var(--color-border);
+            margin-top: 2rem;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            body {
+                padding: 0.5rem;
+            }
+
+            .header {
+                padding: 1.5rem;
+            }
+
+            .header h1 {
+                font-size: 1.5rem;
+            }
+
+            .header .metadata {
+                flex-direction: column;
+                gap: 0.5rem;
+            }
+
+            .topic-header {
+                flex-wrap: wrap;
+            }
+
+            .hot-value {
+                margin-left: 0;
+                width: 100%;
+            }
+
+            .creative-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+        
+        /* Filter Bar */
+        .filter-bar {
+            background-color: var(--color-surface);
+            padding: 1rem 2rem;
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow);
+            margin-bottom: 0.5rem;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+        
+        .filter-bar label {
+            font-weight: bold;
+            color: var(--color-text);
+        }
+        
+        .filter-bar select {
+            padding: 0.5rem;
+            border-radius: 0.25rem;
+            border: 1px solid var(--color-border);
+            font-size: 1rem;
+            min-width: 200px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <header class="header">
+            <h1>微博热搜产品创意分析报告</h1>
+            <div class="subtitle">基于实时热搜榜单的创意挖掘与评估</div>
+            <div class="metadata">
+                <div>生成时间: <strong>2026-01-19 23:45:00</strong></div>
+                <div>分析主题数: <strong>5</strong></div>
+                <div>数据来源: <strong>天行数据API</strong></div>
+            </div>
+        </header>
+
+        <!-- Filter Bar -->
+        <div class="filter-bar">
+            <label for="timeFilter">选择数据时间:</label>
+            <select id="timeFilter" onchange="filterData()">
+                <option value="all">显示全部</option>
+                <!-- FILTER_OPTIONS_PLACEHOLDER -->
+            </select>
+        </div>
+
+        <!-- Executive Summary -->
+        <section class="summary-grid">
+            <div class="summary-card">
+                <h3>优秀创意</h3>
+                <div class="value">3</div>
+                <div class="label">综合评分 ≥ 80</div>
+            </div>
+            <div class="summary-card">
+                <h3>良好创意</h3>
+                <div class="value">2</div>
+                <div class="label">60 ≤ 评分 < 80</div>
+            </div>
+            <div class="summary-card">
+                <h3>平均综合评分</h3>
+                <div class="value">78.4</div>
+                <div class="label">所有创意平均值</div>
+            </div>
+            <div class="summary-card">
+                <h3>最高评分</h3>
+                <div class="value">92</div>
+                <div class="label">最佳创意</div>
+            </div>
+        </section>
+
+        <!-- Topic Analysis Sections -->
+        <div id="contentArea">
+            <!-- CONTENT_PLACEHOLDER -->
+            
+            <!-- Example Topic Section (kept for structure reference, but hidden/replaced by script) -->
+            <section class="topic-section" style="display:none">
+                <div class="topic-header">
+                    <span class="topic-rank">1</span>
+                    <h2 class="topic-title">示例话题</h2>
+                    <span class="topic-label">热</span>
+                    <span class="hot-value">1.2亿</span>
+                </div>
+                <div class="summary-section">
+                    <p>等待数据生成...</p>
+                </div>
+            </section>
+        </div>
+
+        <!-- Recommendations -->
+        <section class="recommendations">
+            <h3>推荐优先级</h3>
+            <div class="recommendation-item">
+                <h4>1. 红包故事生成器 (综合评分: 82)</h4>
+                <p>高娱乐性与社交传播潜力，适合春节期间的病毒式营销。</p>
+            </div>
+            <div class="recommendation-item">
+                <h4>2. AI歌手互动平台 (综合评分: 80)</h4>
+                <p>结合AI技术与音乐娱乐，满足年轻用户的好奇心。</p>
+            </div>
+            <div class="recommendation-item">
+                <h4>3. 新能源汽车比价工具 (综合评分: 78)</h4>
+                <p>实用性强，解决消费者在价格战中的信息不对称问题。</p>
+            </div>
+        </section>
+
+        <!-- Methodology -->
+        <section class="topic-section">
+            <h3>评估方法</h3>
+            <p><strong>综合评分计算:</strong> (有趣度 × 0.8) + (有用度 × 0.2)</p>
+            <p><strong>评级标准:</strong></p>
+            <ul class="timeline-list">
+                <li>优秀 (≥80分): 高娱乐价值或强实用性，市场潜力大</li>
+                <li>良好 (60-79分): 有一定价值，但需要优化或细分市场</li>
+                <li>需要改进 (<60分): 价值有限，建议重新构思</li>
+            </ul>
+            <p><strong>数据来源:</strong> 天行数据微博热搜API + 网络搜索补充信息</p>
+        </section>
+
+        <!-- Footer -->
+        <footer class="footer">
+            <p>本报告由Weibo Hotspot Analysis Skill自动生成 • 仅供内部创意讨论使用</p>
+            <p>生成时间: 2026-01-19 23:45:00 • 版本: 1.0</p>
+        </footer>
+    </div>
+    <script>
+        function filterData() {
+            const selectedHour = document.getElementById('timeFilter').value;
+            const batches = document.querySelectorAll('.data-batch');
+            
+            batches.forEach(batch => {
+                if (selectedHour === 'all' || batch.dataset.hour === selectedHour) {
+                    batch.style.display = 'block';
+                } else {
+                    batch.style.display = 'none';
+                }
+            });
+        }
+        
+        // Initialize: Select the first option (latest) by default if not 'all'
+        window.onload = function() {
+            const select = document.getElementById('timeFilter');
+            if (select.options.length > 1) {
+                // Select the first real option (latest data)
+                select.selectedIndex = 1; 
+                filterData();
+            }
+        };
+    </script>
+</body>
+</html>

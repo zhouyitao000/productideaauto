@@ -1,0 +1,7 @@
+__pycache__/
+*.pyc
+.env
+.DS_Store
+weibo_analysis_report.html
+history_data.json
+example_data.json

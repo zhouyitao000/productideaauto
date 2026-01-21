@@ -1,0 +1,33 @@
+{
+  "code": 200,
+  "msg": "success",
+  "result": {
+    "list": [
+      {
+        "hotword": "春节红包大战升级",
+        "hotwordnum": "1.2亿",
+        "hottag": "热"
+      },
+      {
+        "hotword": "AI歌手发布新专辑",
+        "hotwordnum": "9800万",
+        "hottag": "爆"
+      },
+      {
+        "hotword": "新能源汽车价格战",
+        "hotwordnum": "8500万",
+        "hottag": "热"
+      },
+      {
+        "hotword": "元宇宙婚礼引热议",
+        "hotwordnum": "7200万",
+        "hottag": "新"
+      },
+      {
+        "hotword": "00后整顿职场新现象",
+        "hotwordnum": "6500万",
+        "hottag": "热"
+      }
+    ]
+  }
+}

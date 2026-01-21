@@ -1,0 +1,1907 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- 页面每隔 3600 秒 (1小时) 自动刷新一次，以显示最新数据 -->
+    <meta http-equiv="refresh" content="3600">
+    <title>微博热搜产品创意分析报告</title>
+    <style>
+        /* 简约专业风格 - Simple professional style */
+        :root {
+            --color-excellent: #10b981; /* Green */
+            --color-good: #f59e0b; /* Yellow */
+            --color-needs-improvement: #ef4444; /* Red */
+            --color-background: #f9fafb;
+            --color-surface: #ffffff;
+            --color-text: #111827;
+            --color-text-secondary: #6b7280;
+            --color-border: #e5e7eb;
+            --spacing-unit: 1rem;
+            --border-radius: 0.5rem;
+            --shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
+            --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Helvetica Neue', Arial, sans-serif;
+            line-height: 1.6;
+            color: var(--color-text);
+            background-color: var(--color-background);
+            padding: var(--spacing-unit);
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .container {
+            display: flex;
+            flex-direction: column;
+            gap: 2rem;
+        }
+
+        /* Header */
+        .header {
+            background-color: var(--color-surface);
+            padding: 2rem;
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow);
+            text-align: center;
+            border-top: 4px solid var(--color-excellent);
+        }
+
+        .header h1 {
+            font-size: 2rem;
+            margin-bottom: 0.5rem;
+            color: var(--color-text);
+        }
+
+        .header .subtitle {
+            color: var(--color-text-secondary);
+            font-size: 1rem;
+        }
+
+        .header .metadata {
+            display: flex;
+            justify-content: center;
+            gap: 2rem;
+            margin-top: 1.5rem;
+            font-size: 0.9rem;
+            color: var(--color-text-secondary);
+        }
+
+        /* Summary Cards */
+        .summary-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .summary-card {
+            background-color: var(--color-surface);
+            padding: 1.5rem;
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow);
+            border-left: 4px solid var(--color-excellent);
+        }
+
+        .summary-card h3 {
+            font-size: 1.1rem;
+            margin-bottom: 1rem;
+            color: var(--color-text);
+        }
+
+        .summary-card .value {
+            font-size: 2rem;
+            font-weight: bold;
+            color: var(--color-text);
+        }
+
+        .summary-card .label {
+            font-size: 0.9rem;
+            color: var(--color-text-secondary);
+            margin-top: 0.25rem;
+        }
+
+        /* Topic Section */
+        .topic-section {
+            background-color: var(--color-surface);
+            padding: 2rem;
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow);
+            margin-bottom: 2rem;
+        }
+
+        .topic-header {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid var(--color-border);
+        }
+
+        .topic-rank {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 2.5rem;
+            height: 2.5rem;
+            background-color: var(--color-excellent);
+            color: white;
+            border-radius: 50%;
+            font-weight: bold;
+            font-size: 1.2rem;
+        }
+
+        .topic-title {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: var(--color-text);
+        }
+
+        .topic-label {
+            display: inline-block;
+            padding: 0.25rem 0.75rem;
+            background-color: var(--color-border);
+            border-radius: 1rem;
+            font-size: 0.8rem;
+            font-weight: 500;
+            color: var(--color-text-secondary);
+        }
+
+        .hot-value {
+            margin-left: auto;
+            font-weight: bold;
+            color: var(--color-text);
+        }
+
+        /* Timeline */
+        .timeline-section h4, .summary-section h4, .creative-section h4 {
+            font-size: 1.2rem;
+            margin-bottom: 1rem;
+            color: var(--color-text);
+            padding-bottom: 0.5rem;
+            border-bottom: 1px solid var(--color-border);
+        }
+
+        .timeline-list {
+            list-style-type: none;
+            padding-left: 0;
+        }
+
+        .timeline-list li {
+            position: relative;
+            padding-left: 1.5rem;
+            margin-bottom: 0.75rem;
+            color: var(--color-text-secondary);
+        }
+
+        .timeline-list li:before {
+            content: "•";
+            position: absolute;
+            left: 0;
+            color: var(--color-excellent);
+            font-size: 1.5rem;
+            line-height: 1;
+        }
+
+        /* Creative Cards */
+        .creative-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 1.5rem;
+            margin-top: 1.5rem;
+        }
+
+        .creative-card {
+            background-color: var(--color-surface);
+            padding: 1.5rem;
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow);
+            border-top: 4px solid var(--color-excellent);
+        }
+
+        .creative-card.good {
+            border-top-color: var(--color-good);
+        }
+
+        .creative-card.needs-improvement {
+            border-top-color: var(--color-needs-improvement);
+        }
+
+        .creative-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 1rem;
+        }
+
+        .creative-name {
+            font-size: 1.25rem;
+            font-weight: bold;
+            color: var(--color-text);
+        }
+
+        .quality-badge {
+            display: inline-block;
+            padding: 0.25rem 0.75rem;
+            border-radius: 1rem;
+            font-size: 0.8rem;
+            font-weight: 600;
+            color: white;
+        }
+
+        .badge-excellent {
+            background-color: var(--color-excellent);
+        }
+
+        .badge-good {
+            background-color: var(--color-good);
+        }
+
+        .badge-needs-improvement {
+            background-color: var(--color-needs-improvement);
+        }
+
+        .creative-features {
+            margin-top: 1rem;
+        }
+
+        .creative-features ul {
+            list-style-type: none;
+            padding-left: 0;
+        }
+
+        .creative-features li {
+            padding-left: 1.5rem;
+            position: relative;
+            margin-bottom: 0.5rem;
+            color: var(--color-text-secondary);
+        }
+
+        .creative-features li:before {
+            content: "✓";
+            position: absolute;
+            left: 0;
+            color: var(--color-excellent);
+            font-weight: bold;
+        }
+
+        .score-section {
+            margin-top: 1.5rem;
+            padding-top: 1rem;
+            border-top: 1px solid var(--color-border);
+        }
+
+        .score-breakdown {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-top: 0.75rem;
+        }
+
+        .score-bar {
+            flex-grow: 1;
+            height: 8px;
+            background-color: var(--color-border);
+            border-radius: 4px;
+            overflow: hidden;
+        }
+
+        .score-fill {
+            height: 100%;
+            border-radius: 4px;
+        }
+
+        .score-fill-interest {
+            background-color: var(--color-excellent);
+            width: 80%; /* Placeholder for interesting score */
+        }
+
+        .score-fill-useful {
+            background-color: var(--color-good);
+            width: 20%; /* Placeholder for useful score */
+        }
+
+        .score-labels {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 0.5rem;
+            font-size: 0.85rem;
+            color: var(--color-text-secondary);
+        }
+
+        .total-score {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: var(--color-text);
+            text-align: right;
+            margin-top: 0.5rem;
+        }
+
+        /* Recommendations */
+        .recommendations {
+            background-color: var(--color-surface);
+            padding: 2rem;
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow);
+            border-left: 4px solid var(--color-excellent);
+        }
+
+        .recommendations h3 {
+            font-size: 1.5rem;
+            margin-bottom: 1.5rem;
+            color: var(--color-text);
+        }
+
+        .recommendation-item {
+            padding: 1rem;
+            background-color: var(--color-background);
+            border-radius: var(--border-radius);
+            margin-bottom: 1rem;
+            border-left: 3px solid var(--color-excellent);
+        }
+
+        .recommendation-item h4 {
+            font-size: 1.1rem;
+            color: var(--color-text);
+            margin-bottom: 0.5rem;
+        }
+
+        /* Footer */
+        .footer {
+            text-align: center;
+            padding: 2rem;
+            color: var(--color-text-secondary);
+            font-size: 0.9rem;
+            border-top: 1px solid var(--color-border);
+            margin-top: 2rem;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            body {
+                padding: 0.5rem;
+            }
+
+            .header {
+                padding: 1.5rem;
+            }
+
+            .header h1 {
+                font-size: 1.5rem;
+            }
+
+            .header .metadata {
+                flex-direction: column;
+                gap: 0.5rem;
+            }
+
+            .topic-header {
+                flex-wrap: wrap;
+            }
+
+            .hot-value {
+                margin-left: 0;
+                width: 100%;
+            }
+
+            .creative-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+        
+        /* Filter Bar */
+        .filter-bar {
+            background-color: var(--color-surface);
+            padding: 1rem 2rem;
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow);
+            margin-bottom: 0.5rem;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+        
+        .filter-bar label {
+            font-weight: bold;
+            color: var(--color-text);
+        }
+        
+        .filter-bar select {
+            padding: 0.5rem;
+            border-radius: 0.25rem;
+            border: 1px solid var(--color-border);
+            font-size: 1rem;
+            min-width: 200px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <header class="header">
+            <h1>微博热搜产品创意分析报告</h1>
+            <div class="subtitle">基于实时热搜榜单的创意挖掘与评估</div>
+            <div class="metadata">
+                <div>生成时间: <strong>2026-01-19 23:45:00</strong></div>
+                <div>分析主题数: <strong>5</strong></div>
+                <div>数据来源: <strong>天行数据API</strong></div>
+            </div>
+        </header>
+
+        <!-- Filter Bar -->
+        <div class="filter-bar">
+            <label for="timeFilter">选择数据时间:</label>
+            <select id="timeFilter" onchange="filterData()">
+                <option value="all">显示全部</option>
+                <option value="2026-01-21 15:00">2026-01-21 15:00</option>
+<option value="2026-01-21 15:00">2026-01-21 15:00</option>
+<option value="2026-01-21 15:00">2026-01-21 15:00</option>
+            </select>
+        </div>
+
+        <!-- Executive Summary -->
+        <section class="summary-grid">
+            <div class="summary-card">
+                <h3>优秀创意</h3>
+                <div class="value">8</div>
+                <div class="label">综合评分 ≥ 80</div>
+            </div>
+            <div class="summary-card">
+                <h3>良好创意</h3>
+                <div class="value">2</div>
+                <div class="label">60 ≤ 评分 < 80</div>
+            </div>
+            <div class="summary-card">
+                <h3>平均综合评分</h3>
+                <div class="value">82.4</div>
+                <div class="label">所有创意平均值</div>
+            </div>
+            <div class="summary-card">
+                <h3>最高评分</h3>
+                <div class="value">87.0</div>
+                <div class="label">最佳创意</div>
+            </div>
+        </section>
+
+        <!-- Topic Analysis Sections -->
+        <div id="contentArea">
+            
+            <div class="data-batch" data-hour="2026-01-21 15:00">
+                <div class="batch-header" style="margin: 2rem 0; padding-bottom: 0.5rem; border-bottom: 2px solid #e5e7eb;">
+                    <h2 style="color: #4b5563;">数据时间: 2026-01-21 15:41:02</h2>
+                </div>
+                
+                <section class="topic-section">
+                    <div class="topic-header">
+                        <span class="topic-rank">1</span>
+                        <div style="flex-grow: 1;">
+                            <h2 class="topic-title">10元一斤草莓和300元一斤草莓区别</h2>
+                            <span class="topic-label"></span>
+                            <span class="hot-value">1099816</span>
+                        </div>
+                    </div>
+
+                    <div class="timeline-section">
+                        <h4>事件脉络</h4>
+                        <ul class="timeline-list"></ul>
+                    </div>
+
+                    <div class="summary-section">
+                        <h4>热点详细信息</h4>
+                        <p>该话题探讨了不同价位草莓（10元/斤 vs 300元/斤）的品质差异与消费心理。核心争议点在于高价草莓是否物有所值，涉及品种、产地、种植技术、品牌溢价等因素。讨论延伸至农产品消费升级、价格透明度、以及消费者如何辨别品质与价值。话题反映了当前市场对高端农产品的认知分化，以及消费者对性价比与体验感的双重追求。</p>
+                    </div>
+
+                    <div class="creative-section">
+                        <h4>产品创意 (AI/软件)</h4>
+                        <div class="creative-grid">
+                            
+                    <div class="creative-card excellent">
+                        <div class="creative-header">
+                            <h3 class="creative-name">莓探AI</h3>
+                            <span class="quality-badge badge-excellent">优秀</span>
+                        </div>
+                        <div class="creative-features">
+                            <ul><li>手机拍照识别草莓品种与产地</li>
+<li>AI品质评分（甜度、新鲜度、大小均匀度预测）</li>
+<li>实时比价与购买渠道推荐</li>
+<li>虚拟试吃体验（AR模拟口感与香气）</li></ul>
+                        </div>
+                        <div class="target-users">
+                            <strong>目标用户:</strong> 生鲜消费者、水果采购员、美食爱好者
+                        </div>
+                        <div class="score-section">
+                            <div class="score-breakdown">
+                                <div class="score-bar">
+                                    <div class="score-fill score-fill-interest" style="width: 80%"></div>
+                                </div>
+                                <span>有趣度: 80/100</span>
+                            </div>
+                            <div class="score-breakdown">
+                                <div class="score-bar">
+                                    <div class="score-fill score-fill-useful" style="width: 85%"></div>
+                                </div>
+                                <span>有用度: 85/100</span>
+                            </div>
+                            <div class="total-score">综合评分: 81.0/100</div>
+                        </div>
+                    </div>
+                    
+                    <div class="creative-card good">
+                        <div class="creative-header">
+                            <h3 class="creative-name">果价预言家</h3>
+                            <span class="quality-badge badge-good">良好</span>
+                        </div>
+                        <div class="creative-features">
+                            <ul><li>基于历史数据与气候预测的AI价格趋势分析</li>
+<li>个性化订阅提醒（心仪品种降价/新品上市）</li>
+<li>产地直供溯源地图（VR全景查看种植环境）</li>
+<li>社区评测与KOL带货指数分析</li></ul>
+                        </div>
+                        <div class="target-users">
+                            <strong>目标用户:</strong> 精打细算的消费者、水果零售商、供应链管理者
+                        </div>
+                        <div class="score-section">
+                            <div class="score-breakdown">
+                                <div class="score-bar">
+                                    <div class="score-fill score-fill-interest" style="width: 75%"></div>
+                                </div>
+                                <span>有趣度: 75/100</span>
+                            </div>
+                            <div class="score-breakdown">
+                                <div class="score-bar">
+                                    <div class="score-fill score-fill-useful" style="width: 90%"></div>
+                                </div>
+                                <span>有用度: 90/100</span>
+                            </div>
+                            <div class="total-score">综合评分: 78.0/100</div>
+                        </div>
+                    </div>
+                    
+                        </div>
+                    </div>
+                </section>
+                
+                <section class="topic-section">
+                    <div class="topic-header">
+                        <span class="topic-rank">2</span>
+                        <div style="flex-grow: 1;">
+                            <h2 class="topic-title">男子献血2.2万毫升景区不免票被告</h2>
+                            <span class="topic-label"></span>
+                            <span class="hot-value">819129</span>
+                        </div>
+                    </div>
+
+                    <div class="timeline-section">
+                        <h4>事件脉络</h4>
+                        <ul class="timeline-list"></ul>
+                    </div>
+
+                    <div class="summary-section">
+                        <h4>热点详细信息</h4>
+                        <p>该事件围绕一名累计献血2.2万毫升的男子展开，其持献血证前往某景区时未能享受免票优惠，随后将景区告上法庭。事件核心争议点在于献血荣誉权益（如景区免票）的实际落地情况，以及相关法规或承诺的执行力度。该案例引发了公众对献血者激励政策、社会信用体系以及公共服务机构承诺兑现等问题的广泛讨论。</p>
+                    </div>
+
+                    <div class="creative-section">
+                        <h4>产品创意 (AI/软件)</h4>
+                        <div class="creative-grid">
+                            
+                    <div class="creative-card good">
+                        <div class="creative-header">
+                            <h3 class="creative-name">权益守护AI助手</h3>
+                            <span class="quality-badge badge-good">良好</span>
+                        </div>
+                        <div class="creative-features">
+                            <ul><li>智能识别各地针对献血者、志愿者等群体的优惠政策（免票、折扣等）</li>
+<li>基于用户位置和身份标签实时推送可用权益提醒</li>
+<li>一键生成权益申诉材料，对接相关投诉平台</li></ul>
+                        </div>
+                        <div class="target-users">
+                            <strong>目标用户:</strong> 献血者、志愿者、退役军人等享有社会优待政策的群体
+                        </div>
+                        <div class="score-section">
+                            <div class="score-breakdown">
+                                <div class="score-bar">
+                                    <div class="score-fill score-fill-interest" style="width: 75%"></div>
+                                </div>
+                                <span>有趣度: 75/100</span>
+                            </div>
+                            <div class="score-breakdown">
+                                <div class="score-bar">
+                                    <div class="score-fill score-fill-useful" style="width: 90%"></div>
+                                </div>
+                                <span>有用度: 90/100</span>
+                            </div>
+                            <div class="total-score">综合评分: 78.0/100</div>
+                        </div>
+                    </div>
+                    
+                    <div class="creative-card excellent">
+                        <div class="creative-header">
+                            <h3 class="creative-name">承诺雷达-社会信用可视化平台</h3>
+                            <span class="quality-badge badge-excellent">优秀</span>
+                        </div>
+                        <div class="creative-features">
+                            <ul><li>AI爬虫自动抓取并解析政府、企业发布的各类公益承诺（如献血免票、见义勇为奖励）</li>
+<li>利用NLP技术分析承诺条款的明确性与执行难度，生成“承诺可信度指数”</li>
+<li>用户UGC打卡验证承诺履行情况，形成动态“承诺履行地图”</li></ul>
+                        </div>
+                        <div class="target-users">
+                            <strong>目标用户:</strong> 关心社会诚信建设的公众、媒体、政策研究者及公益组织
+                        </div>
+                        <div class="score-section">
+                            <div class="score-breakdown">
+                                <div class="score-bar">
+                                    <div class="score-fill score-fill-interest" style="width: 85%"></div>
+                                </div>
+                                <span>有趣度: 85/100</span>
+                            </div>
+                            <div class="score-breakdown">
+                                <div class="score-bar">
+                                    <div class="score-fill score-fill-useful" style="width: 80%"></div>
+                                </div>
+                                <span>有用度: 80/100</span>
+                            </div>
+                            <div class="total-score">综合评分: 84.0/100</div>
+                        </div>
+                    </div>
+                    
+                        </div>
+                    </div>
+                </section>
+                
+                <section class="topic-section">
+                    <div class="topic-header">
+                        <span class="topic-rank">3</span>
+                        <div style="flex-grow: 1;">
+                            <h2 class="topic-title">五个新概括2025年经济工作成绩单</h2>
+                            <span class="topic-label"></span>
+                            <span class="hot-value">718671</span>
+                        </div>
+                    </div>
+
+                    <div class="timeline-section">
+                        <h4>事件脉络</h4>
+                        <ul class="timeline-list"></ul>
+                    </div>
+
+                    <div class="summary-section">
+                        <h4>热点详细信息</h4>
+                        <p>该微博热搜话题“五个新概括2025年经济工作成绩单”聚焦于对2025年度经济工作的总结与概括。从话题名称推断，其核心内容可能是通过五个新的维度或视角（如新成就、新突破、新动能、新格局、新气象等）来系统梳理和展示2025年经济领域的主要成果、发展亮点与工作进展。这类总结通常涉及宏观经济运行、产业结构优化、科技创新、改革开放、民生保障等多个方面，旨在向社会公众清晰传达经济发展的积极态势与未来信心。由于搜索结果未提供具体事件细节与时间节点，以上分析基于话题本身的常规解读。</p>
+                    </div>
+
+                    <div class="creative-section">
+                        <h4>产品创意 (AI/软件)</h4>
+                        <div class="creative-grid">
+                            
+                    <div class="creative-card excellent">
+                        <div class="creative-header">
+                            <h3 class="creative-name">经济脉动AI</h3>
+                            <span class="quality-badge badge-excellent">优秀</span>
+                        </div>
+                        <div class="creative-features">
+                            <ul><li>基于‘五个新’框架智能生成个人年度经济报告</li>
+<li>AI对比分析个人财务数据与国家宏观经济趋势</li>
+<li>可视化互动图表展示个人经济行为与宏观指标的关联</li></ul>
+                        </div>
+                        <div class="target-users">
+                            <strong>目标用户:</strong> 关注宏观经济的个人投资者、企业管理者、经济学者及普通市民
+                        </div>
+                        <div class="score-section">
+                            <div class="score-breakdown">
+                                <div class="score-bar">
+                                    <div class="score-fill score-fill-interest" style="width: 80%"></div>
+                                </div>
+                                <span>有趣度: 80/100</span>
+                            </div>
+                            <div class="score-breakdown">
+                                <div class="score-bar">
+                                    <div class="score-fill score-fill-useful" style="width: 85%"></div>
+                                </div>
+                                <span>有用度: 85/100</span>
+                            </div>
+                            <div class="total-score">综合评分: 81.0/100</div>
+                        </div>
+                    </div>
+                    
+                    <div class="creative-card excellent">
+                        <div class="creative-header">
+                            <h3 class="creative-name">热点经济学人</h3>
+                            <span class="quality-badge badge-excellent">优秀</span>
+                        </div>
+                        <div class="creative-features">
+                            <ul><li>AI实时抓取并解读微博等平台的经济类热搜话题</li>
+<li>基于大模型生成通俗易懂的‘热搜词条经济学’背景与影响分析</li>
+<li>互动问答模拟经济政策制定或市场情景推演游戏</li></ul>
+                        </div>
+                        <div class="target-users">
+                            <strong>目标用户:</strong> 对经济学感兴趣的年轻网民、学生群体、自媒体内容创作者
+                        </div>
+                        <div class="score-section">
+                            <div class="score-breakdown">
+                                <div class="score-bar">
+                                    <div class="score-fill score-fill-interest" style="width: 90%"></div>
+                                </div>
+                                <span>有趣度: 90/100</span>
+                            </div>
+                            <div class="score-breakdown">
+                                <div class="score-bar">
+                                    <div class="score-fill score-fill-useful" style="width: 75%"></div>
+                                </div>
+                                <span>有用度: 75/100</span>
+                            </div>
+                            <div class="total-score">综合评分: 87.0/100</div>
+                        </div>
+                    </div>
+                    
+                        </div>
+                    </div>
+                </section>
+                
+                <section class="topic-section">
+                    <div class="topic-header">
+                        <span class="topic-rank">4</span>
+                        <div style="flex-grow: 1;">
+                            <h2 class="topic-title">车厘子降价后黑草莓成水果新贵</h2>
+                            <span class="topic-label"></span>
+                            <span class="hot-value">699785</span>
+                        </div>
+                    </div>
+
+                    <div class="timeline-section">
+                        <h4>事件脉络</h4>
+                        <ul class="timeline-list"></ul>
+                    </div>
+
+                    <div class="summary-section">
+                        <h4>热点详细信息</h4>
+                        <p>近期，随着车厘子价格下降，一种名为“黑草莓”的水果成为市场新宠。据报道，黑草莓因其独特的外观和口感受到消费者青睐，价格相对较高，成为水果市场的新贵。这一现象反映了消费者对新颖、特色水果的追求，以及水果市场消费趋势的变化。</p>
+                    </div>
+
+                    <div class="creative-section">
+                        <h4>产品创意 (AI/软件)</h4>
+                        <div class="creative-grid">
+                            
+                    <div class="creative-card excellent">
+                        <div class="creative-header">
+                            <h3 class="creative-name">果市AI侦探</h3>
+                            <span class="quality-badge badge-excellent">优秀</span>
+                        </div>
+                        <div class="creative-features">
+                            <ul><li>实时监测水果市场价格波动，预测下一个‘爆款’水果</li>
+<li>AI算法分析社交媒体趋势，识别潜在热门水果</li>
+<li>个性化推荐水果购买时机和替代品</li></ul>
+                        </div>
+                        <div class="target-users">
+                            <strong>目标用户:</strong> 水果爱好者、美食博主、水果零售商、家庭采购者
+                        </div>
+                        <div class="score-section">
+                            <div class="score-breakdown">
+                                <div class="score-bar">
+                                    <div class="score-fill score-fill-interest" style="width: 80%"></div>
+                                </div>
+                                <span>有趣度: 80/100</span>
+                            </div>
+                            <div class="score-breakdown">
+                                <div class="score-bar">
+                                    <div class="score-fill score-fill-useful" style="width: 85%"></div>
+                                </div>
+                                <span>有用度: 85/100</span>
+                            </div>
+                            <div class="total-score">综合评分: 81.0/100</div>
+                        </div>
+                    </div>
+                    
+                    <div class="creative-card excellent">
+                        <div class="creative-header">
+                            <h3 class="creative-name">AI水果美学馆</h3>
+                            <span class="quality-badge badge-excellent">优秀</span>
+                        </div>
+                        <div class="creative-features">
+                            <ul><li>AI生成水果创意摄影和短视频，如‘黑草莓星空’</li>
+<li>虚拟水果搭配师，推荐水果拼盘美学方案</li>
+<li>AR试吃体验，模拟不同水果的口感和风味</li></ul>
+                        </div>
+                        <div class="target-users">
+                            <strong>目标用户:</strong> 美食内容创作者、社交媒体用户、水果品牌、生活美学爱好者
+                        </div>
+                        <div class="score-section">
+                            <div class="score-breakdown">
+                                <div class="score-bar">
+                                    <div class="score-fill score-fill-interest" style="width: 90%"></div>
+                                </div>
+                                <span>有趣度: 90/100</span>
+                            </div>
+                            <div class="score-breakdown">
+                                <div class="score-bar">
+                                    <div class="score-fill score-fill-useful" style="width: 65%"></div>
+                                </div>
+                                <span>有用度: 65/100</span>
+                            </div>
+                            <div class="total-score">综合评分: 85.0/100</div>
+                        </div>
+                    </div>
+                    
+                        </div>
+                    </div>
+                </section>
+                
+                <section class="topic-section">
+                    <div class="topic-header">
+                        <span class="topic-rank">5</span>
+                        <div style="flex-grow: 1;">
+                            <h2 class="topic-title">王昭君新皮肤长夜焕生</h2>
+                            <span class="topic-label"></span>
+                            <span class="hot-value">370707</span>
+                        </div>
+                    </div>
+
+                    <div class="timeline-section">
+                        <h4>事件脉络</h4>
+                        <ul class="timeline-list"></ul>
+                    </div>
+
+                    <div class="summary-section">
+                        <h4>热点详细信息</h4>
+                        <p>微博热搜话题“王昭君新皮肤长夜焕生”涉及手游《王者荣耀》中英雄王昭君的新皮肤发布。该皮肤以“长夜焕生”为主题，设计风格可能融合了奇幻、星空或暗夜元素，引发了玩家社区的广泛讨论。话题热度主要源于玩家对新皮肤外观、特效、获取方式及性价比的关注与评价，反映了游戏皮肤作为数字商品在玩家社群中的重要性和影响力。</p>
+                    </div>
+
+                    <div class="creative-section">
+                        <h4>产品创意 (AI/软件)</h4>
+                        <div class="creative-grid">
+                            
+                    <div class="creative-card excellent">
+                        <div class="creative-header">
+                            <h3 class="creative-name">AI皮肤试妆与风格迁移助手</h3>
+                            <span class="quality-badge badge-excellent">优秀</span>
+                        </div>
+                        <div class="creative-features">
+                            <ul><li>基于用户上传的自拍或虚拟形象，AI生成穿戴“长夜焕生”等游戏皮肤后的效果图</li>
+<li>支持皮肤风格迁移，可将任意皮肤主题（如星空、暗夜）应用到其他游戏角色或现实穿搭上</li>
+<li>提供皮肤细节（如特效、配色）的个性化调整与预览</li></ul>
+                        </div>
+                        <div class="target-users">
+                            <strong>目标用户:</strong> 《王者荣耀》玩家、游戏皮肤爱好者、Cosplay爱好者、数字艺术创作者
+                        </div>
+                        <div class="score-section">
+                            <div class="score-breakdown">
+                                <div class="score-bar">
+                                    <div class="score-fill score-fill-interest" style="width: 90%"></div>
+                                </div>
+                                <span>有趣度: 90/100</span>
+                            </div>
+                            <div class="score-breakdown">
+                                <div class="score-bar">
+                                    <div class="score-fill score-fill-useful" style="width: 75%"></div>
+                                </div>
+                                <span>有用度: 75/100</span>
+                            </div>
+                            <div class="total-score">综合评分: 87.0/100</div>
+                        </div>
+                    </div>
+                    
+                    <div class="creative-card excellent">
+                        <div class="creative-header">
+                            <h3 class="creative-name">皮肤主题AI叙事生成器</h3>
+                            <span class="quality-badge badge-excellent">优秀</span>
+                        </div>
+                        <div class="creative-features">
+                            <ul><li>输入皮肤名称（如“长夜焕生”），AI自动生成与该皮肤主题相关的背景故事、角色台词或短篇叙事</li>
+<li>支持用户自定义叙事风格（如史诗、奇幻、日常）并生成配套的视觉概念图或动态场景</li>
+<li>提供社区分享功能，用户可发布、评分并基于他人生成的叙事进行二次创作</li></ul>
+                        </div>
+                        <div class="target-users">
+                            <strong>目标用户:</strong> 游戏剧情爱好者、同人创作者、内容创作者、游戏社区运营者
+                        </div>
+                        <div class="score-section">
+                            <div class="score-breakdown">
+                                <div class="score-bar">
+                                    <div class="score-fill score-fill-interest" style="width: 85%"></div>
+                                </div>
+                                <span>有趣度: 85/100</span>
+                            </div>
+                            <div class="score-breakdown">
+                                <div class="score-bar">
+                                    <div class="score-fill score-fill-useful" style="width: 70%"></div>
+                                </div>
+                                <span>有用度: 70/100</span>
+                            </div>
+                            <div class="total-score">综合评分: 82.0/100</div>
+                        </div>
+                    </div>
+                    
+                        </div>
+                    </div>
+                </section>
+                
+            </div>
+            
+
+            <div class="data-batch" data-hour="2026-01-21 15:00">
+                <div class="batch-header" style="margin: 2rem 0; padding-bottom: 0.5rem; border-bottom: 2px solid #e5e7eb;">
+                    <h2 style="color: #4b5563;">数据时间: 2026-01-21 15:35:27</h2>
+                </div>
+                
+                <section class="topic-section">
+                    <div class="topic-header">
+                        <span class="topic-rank">1</span>
+                        <div style="flex-grow: 1;">
+                            <h2 class="topic-title">10元一斤草莓和300元一斤草莓区别</h2>
+                            <span class="topic-label"></span>
+                            <span class="hot-value">1086993</span>
+                        </div>
+                    </div>
+
+                    <div class="timeline-section">
+                        <h4>事件脉络</h4>
+                        <ul class="timeline-list"></ul>
+                    </div>
+
+                    <div class="summary-section">
+                        <h4>热点详细信息</h4>
+                        <p>该热搜话题探讨了不同价位草莓（10元/斤 vs 300元/斤）在口感、品质、产地、种植方式等方面的差异，反映了消费者对农产品价值认知的讨论。话题引发了对高端农产品溢价合理性、消费分级现象的关注，部分观点认为高价草莓可能涉及品牌营销、稀有品种或特殊种植技术，而普通草莓则满足日常需求。讨论延伸至农产品标准化、透明溯源等议题。</p>
+                    </div>
+
+                    <div class="creative-section">
+                        <h4>产品创意 (AI/软件)</h4>
+                        <div class="creative-grid">
+                            
+                    <div class="creative-card excellent">
+                        <div class="creative-header">
+                            <h3 class="creative-name">AI水果品鉴师</h3>
+                            <span class="quality-badge badge-excellent">优秀</span>
+                        </div>
+                        <div class="creative-features">
+                            <ul><li>通过手机摄像头扫描草莓外观，AI分析色泽、形状、籽粒分布并给出品质评分</li>
+<li>结合用户输入的价格、产地信息，生成多维对比报告（甜度预测、性价比分析、品种溯源）</li>
+<li>模拟口感描述生成器：用趣味文案描述不同价位草莓的“味觉体验”</li></ul>
+                        </div>
+                        <div class="target-users">
+                            <strong>目标用户:</strong> 生鲜消费者、美食爱好者、内容创作者
+                        </div>
+                        <div class="score-section">
+                            <div class="score-breakdown">
+                                <div class="score-bar">
+                                    <div class="score-fill score-fill-interest" style="width: 88%"></div>
+                                </div>
+                                <span>有趣度: 88/100</span>
+                            </div>
+                            <div class="score-breakdown">
+                                <div class="score-bar">
+                                    <div class="score-fill score-fill-useful" style="width: 75%"></div>
+                                </div>
+                                <span>有用度: 75/100</span>
+                            </div>
+                            <div class="total-score">综合评分: 85.4/100</div>
+                        </div>
+                    </div>
+                    
+                    <div class="creative-card good">
+                        <div class="creative-header">
+                            <h3 class="creative-name">农产品价值透视镜</h3>
+                            <span class="quality-badge badge-good">良好</span>
+                        </div>
+                        <div class="creative-features">
+                            <ul><li>AI驱动成本拆解模型：输入草莓价格后，可视化展示种植、物流、品牌溢价等成本构成</li>
+<li>跨区域比价系统：基于地理位置的实时价格对比，标注稀有品种/有机认证等增值因素</li>
+<li>个性化推荐引擎：根据用户消费记录推荐性价比最优的购买渠道与品种</li></ul>
+                        </div>
+                        <div class="target-users">
+                            <strong>目标用户:</strong> 价格敏感型消费者、农产品采购商、农业研究者
+                        </div>
+                        <div class="score-section">
+                            <div class="score-breakdown">
+                                <div class="score-bar">
+                                    <div class="score-fill score-fill-interest" style="width: 70%"></div>
+                                </div>
+                                <span>有趣度: 70/100</span>
+                            </div>
+                            <div class="score-breakdown">
+                                <div class="score-bar">
+                                    <div class="score-fill score-fill-useful" style="width: 90%"></div>
+                                </div>
+                                <span>有用度: 90/100</span>
+                            </div>
+                            <div class="total-score">综合评分: 74.0/100</div>
+                        </div>
+                    </div>
+                    
+                        </div>
+                    </div>
+                </section>
+                
+                <section class="topic-section">
+                    <div class="topic-header">
+                        <span class="topic-rank">2</span>
+                        <div style="flex-grow: 1;">
+                            <h2 class="topic-title">男子献血2.2万毫升景区不免票被告</h2>
+                            <span class="topic-label"></span>
+                            <span class="hot-value">803783</span>
+                        </div>
+                    </div>
+
+                    <div class="timeline-section">
+                        <h4>事件脉络</h4>
+                        <ul class="timeline-list"></ul>
+                    </div>
+
+                    <div class="summary-section">
+                        <h4>热点详细信息</h4>
+                        <p>该事件涉及一名累计献血量达2.2万毫升的男子，因某景区未按相关政策或承诺为其提供免票优惠，遂将景区告上法庭。事件引发了公众对献血者权益保障、景区诚信及社会公益激励机制的广泛讨论。核心争议点在于景区是否应履行对献血者的优待承诺，以及献血者荣誉制度在实际执行中的落实情况。</p>
+                    </div>
+
+                    <div class="creative-section">
+                        <h4>产品创意 (AI/软件)</h4>
+                        <div class="creative-grid">
+                            
+                    <div class="creative-card good">
+                        <div class="creative-header">
+                            <h3 class="creative-name">公益权益守护者AI助手</h3>
+                            <span class="quality-badge badge-good">良好</span>
+                        </div>
+                        <div class="creative-features">
+                            <ul><li>智能识别各地针对献血者、志愿者等公益人士的优惠政策</li>
+<li>自动匹配用户公益记录与可享受权益，生成个性化权益清单</li>
+<li>一键生成权益申诉材料，提供法律条文与案例支持</li></ul>
+                        </div>
+                        <div class="target-users">
+                            <strong>目标用户:</strong> 长期参与献血、志愿服务等公益活动的市民
+                        </div>
+                        <div class="score-section">
+                            <div class="score-breakdown">
+                                <div class="score-bar">
+                                    <div class="score-fill score-fill-interest" style="width: 75%"></div>
+                                </div>
+                                <span>有趣度: 75/100</span>
+                            </div>
+                            <div class="score-breakdown">
+                                <div class="score-bar">
+                                    <div class="score-fill score-fill-useful" style="width: 90%"></div>
+                                </div>
+                                <span>有用度: 90/100</span>
+                            </div>
+                            <div class="total-score">综合评分: 78.0/100</div>
+                        </div>
+                    </div>
+                    
+                    <div class="creative-card excellent">
+                        <div class="creative-header">
+                            <h3 class="creative-name">热搜法庭：AI社会议题模拟器</h3>
+                            <span class="quality-badge badge-excellent">优秀</span>
+                        </div>
+                        <div class="creative-features">
+                            <ul><li>抓取实时社会热点争议事件作为案例素材</li>
+<li>用户可扮演原告、被告或法官，与AI生成的不同立场角色进行辩论</li>
+<li>AI根据辩论生成胜率预测、舆论风向分析和虚拟判决书</li></ul>
+                        </div>
+                        <div class="target-users">
+                            <strong>目标用户:</strong> 关心社会时事、喜欢思辨与角色扮演的年轻网民
+                        </div>
+                        <div class="score-section">
+                            <div class="score-breakdown">
+                                <div class="score-bar">
+                                    <div class="score-fill score-fill-interest" style="width: 95%"></div>
+                                </div>
+                                <span>有趣度: 95/100</span>
+                            </div>
+                            <div class="score-breakdown">
+                                <div class="score-bar">
+                                    <div class="score-fill score-fill-useful" style="width: 65%"></div>
+                                </div>
+                                <span>有用度: 65/100</span>
+                            </div>
+                            <div class="total-score">综合评分: 89.0/100</div>
+                        </div>
+                    </div>
+                    
+                        </div>
+                    </div>
+                </section>
+                
+                <section class="topic-section">
+                    <div class="topic-header">
+                        <span class="topic-rank">3</span>
+                        <div style="flex-grow: 1;">
+                            <h2 class="topic-title">五个新概括2025年经济工作成绩单</h2>
+                            <span class="topic-label"></span>
+                            <span class="hot-value">620842</span>
+                        </div>
+                    </div>
+
+                    <div class="timeline-section">
+                        <h4>事件脉络</h4>
+                        <ul class="timeline-list"></ul>
+                    </div>
+
+                    <div class="summary-section">
+                        <h4>热点详细信息</h4>
+                        <p>该话题聚焦于对2025年经济工作的总结，通过“五个新”这一概括性框架来梳理和展示年度经济成就。这通常涉及对宏观经济数据、产业发展、科技创新、民生改善等关键领域的回顾与分析，旨在向公众清晰传达过去一年的经济发展亮点与整体态势。由于搜索结果未提供具体事件时间点，无法构建详细时间线。</p>
+                    </div>
+
+                    <div class="creative-section">
+                        <h4>产品创意 (AI/软件)</h4>
+                        <div class="creative-grid">
+                            
+                    <div class="creative-card excellent">
+                        <div class="creative-header">
+                            <h3 class="creative-name">经济成就AI解读官</h3>
+                            <span class="quality-badge badge-excellent">优秀</span>
+                        </div>
+                        <div class="creative-features">
+                            <ul><li>基于官方经济数据与报告，AI自动生成‘N个新’等通俗化、可视化总结报告</li>
+<li>支持用户输入关键词（如‘新能源’、‘消费’），AI深度解读该领域年度进展与个人关联</li>
+<li>内置‘成就地图’功能，以互动时间轴与关系图谱展示不同经济领域的联动发展</li></ul>
+                        </div>
+                        <div class="target-users">
+                            <strong>目标用户:</strong> 关注宏观经济的普通公众、学生、财经领域初学者
+                        </div>
+                        <div class="score-section">
+                            <div class="score-breakdown">
+                                <div class="score-bar">
+                                    <div class="score-fill score-fill-interest" style="width: 80%"></div>
+                                </div>
+                                <span>有趣度: 80/100</span>
+                            </div>
+                            <div class="score-breakdown">
+                                <div class="score-bar">
+                                    <div class="score-fill score-fill-useful" style="width: 85%"></div>
+                                </div>
+                                <span>有用度: 85/100</span>
+                            </div>
+                            <div class="total-score">综合评分: 81.0/100</div>
+                        </div>
+                    </div>
+                    
+                    <div class="creative-card excellent">
+                        <div class="creative-header">
+                            <h3 class="creative-name">未来经济趋势推演器</h3>
+                            <span class="quality-badge badge-excellent">优秀</span>
+                        </div>
+                        <div class="creative-features">
+                            <ul><li>输入历年‘经济成绩单’关键词或数据，AI模拟推演未来1-3年可能出现的‘新趋势’与‘新挑战’</li>
+<li>提供多情景推演（如乐观、中性、悲观），并生成对应的行业机会与风险提示简报</li>
+<li>用户可创建‘个人经济沙盘’，关联自身职业、资产，获得个性化趋势影响分析与建议</li></ul>
+                        </div>
+                        <div class="target-users">
+                            <strong>目标用户:</strong> 投资者、企业战略规划者、创业者、经济研究者
+                        </div>
+                        <div class="score-section">
+                            <div class="score-breakdown">
+                                <div class="score-bar">
+                                    <div class="score-fill score-fill-interest" style="width: 90%"></div>
+                                </div>
+                                <span>有趣度: 90/100</span>
+                            </div>
+                            <div class="score-breakdown">
+                                <div class="score-bar">
+                                    <div class="score-fill score-fill-useful" style="width: 75%"></div>
+                                </div>
+                                <span>有用度: 75/100</span>
+                            </div>
+                            <div class="total-score">综合评分: 87.0/100</div>
+                        </div>
+                    </div>
+                    
+                        </div>
+                    </div>
+                </section>
+                
+                <section class="topic-section">
+                    <div class="topic-header">
+                        <span class="topic-rank">4</span>
+                        <div style="flex-grow: 1;">
+                            <h2 class="topic-title">山上彻也哥哥自杀后萌生报复念头</h2>
+                            <span class="topic-label"></span>
+                            <span class="hot-value">534325</span>
+                        </div>
+                    </div>
+
+                    <div class="timeline-section">
+                        <h4>事件脉络</h4>
+                        <ul class="timeline-list"></ul>
+                    </div>
+
+                    <div class="summary-section">
+                        <h4>热点详细信息</h4>
+                        <p>该热搜话题涉及日本前首相安倍晋三遇刺案嫌疑人山上彻也的作案动机。据媒体报道，山上彻也在其哥哥自杀后萌生了报复念头，最终实施了刺杀行动。事件揭示了家庭悲剧、个人心理创伤与社会极端行为之间的复杂关联，引发了公众对心理健康干预、社会支持体系及极端事件预防机制的广泛讨论。</p>
+                    </div>
+
+                    <div class="creative-section">
+                        <h4>产品创意 (AI/软件)</h4>
+                        <div class="creative-grid">
+                            
+                    <div class="creative-card good">
+                        <div class="creative-header">
+                            <h3 class="creative-name">心迹追踪AI助手</h3>
+                            <span class="quality-badge badge-good">良好</span>
+                        </div>
+                        <div class="creative-features">
+                            <ul><li>基于自然语言处理分析社交媒体及日记中的情绪变化轨迹</li>
+<li>识别潜在心理危机信号并提供预警提示</li>
+<li>连接专业心理咨询师或危机干预资源</li></ul>
+                        </div>
+                        <div class="target-users">
+                            <strong>目标用户:</strong> 有心理健康风险的个人、家属、社区工作者及心理咨询机构
+                        </div>
+                        <div class="score-section">
+                            <div class="score-breakdown">
+                                <div class="score-bar">
+                                    <div class="score-fill score-fill-interest" style="width: 75%"></div>
+                                </div>
+                                <span>有趣度: 75/100</span>
+                            </div>
+                            <div class="score-breakdown">
+                                <div class="score-bar">
+                                    <div class="score-fill score-fill-useful" style="width: 90%"></div>
+                                </div>
+                                <span>有用度: 90/100</span>
+                            </div>
+                            <div class="total-score">综合评分: 78.0/100</div>
+                        </div>
+                    </div>
+                    
+                    <div class="creative-card excellent">
+                        <div class="creative-header">
+                            <h3 class="creative-name">剧情重构AI剧本工坊</h3>
+                            <span class="quality-badge badge-excellent">优秀</span>
+                        </div>
+                        <div class="creative-features">
+                            <ul><li>输入真实社会事件关键词，AI自动生成多版本虚构剧本（如电影、小说大纲）</li>
+<li>提供不同角色视角（如当事人、家属、旁观者）的叙事线</li>
+<li>内置伦理讨论模块，引导用户思考事件背后的复杂成因</li></ul>
+                        </div>
+                        <div class="target-users">
+                            <strong>目标用户:</strong> 编剧、作家、社会议题研究者、教育工作者及对叙事创作感兴趣的公众
+                        </div>
+                        <div class="score-section">
+                            <div class="score-breakdown">
+                                <div class="score-bar">
+                                    <div class="score-fill score-fill-interest" style="width: 88%"></div>
+                                </div>
+                                <span>有趣度: 88/100</span>
+                            </div>
+                            <div class="score-breakdown">
+                                <div class="score-bar">
+                                    <div class="score-fill score-fill-useful" style="width: 65%"></div>
+                                </div>
+                                <span>有用度: 65/100</span>
+                            </div>
+                            <div class="total-score">综合评分: 83.4/100</div>
+                        </div>
+                    </div>
+                    
+                        </div>
+                    </div>
+                </section>
+                
+                <section class="topic-section">
+                    <div class="topic-header">
+                        <span class="topic-rank">5</span>
+                        <div style="flex-grow: 1;">
+                            <h2 class="topic-title">王昭君新皮肤长夜焕生</h2>
+                            <span class="topic-label"></span>
+                            <span class="hot-value">414580</span>
+                        </div>
+                    </div>
+
+                    <div class="timeline-section">
+                        <h4>事件脉络</h4>
+                        <ul class="timeline-list"></ul>
+                    </div>
+
+                    <div class="summary-section">
+                        <h4>热点详细信息</h4>
+                        <p>微博热搜话题“王昭君新皮肤长夜焕生”涉及手游《王者荣耀》中英雄王昭君的新皮肤发布。该皮肤以“长夜焕生”为主题，设计上可能融合了夜色、重生或奇幻元素，引发玩家对美术风格、技能特效和获取方式的讨论。作为热门MOBA游戏的更新内容，新皮肤通常能带动游戏内消费、社区活跃度和二次创作。话题热度反映了玩家对游戏内容更新的持续关注及皮肤作为虚拟商品的市场吸引力。</p>
+                    </div>
+
+                    <div class="creative-section">
+                        <h4>产品创意 (AI/软件)</h4>
+                        <div class="creative-grid">
+                            
+                    <div class="creative-card excellent">
+                        <div class="creative-header">
+                            <h3 class="creative-name">AI皮肤设计师</h3>
+                            <span class="quality-badge badge-excellent">优秀</span>
+                        </div>
+                        <div class="creative-features">
+                            <ul><li>基于用户上传的照片或描述，AI生成个性化游戏皮肤概念图</li>
+<li>支持调整风格（如古风、科幻、奇幻）、配色和特效元素</li>
+<li>一键生成皮肤技能特效动画预览</li>
+<li>社区分享与投票功能，热门设计可提交游戏官方参考</li></ul>
+                        </div>
+                        <div class="target-users">
+                            <strong>目标用户:</strong> 《王者荣耀》玩家、游戏美术爱好者、同人创作者
+                        </div>
+                        <div class="score-section">
+                            <div class="score-breakdown">
+                                <div class="score-bar">
+                                    <div class="score-fill score-fill-interest" style="width: 90%"></div>
+                                </div>
+                                <span>有趣度: 90/100</span>
+                            </div>
+                            <div class="score-breakdown">
+                                <div class="score-bar">
+                                    <div class="score-fill score-fill-useful" style="width: 75%"></div>
+                                </div>
+                                <span>有用度: 75/100</span>
+                            </div>
+                            <div class="total-score">综合评分: 87.0/100</div>
+                        </div>
+                    </div>
+                    
+                    <div class="creative-card excellent">
+                        <div class="creative-header">
+                            <h3 class="creative-name">虚拟皮肤试穿与社交平台</h3>
+                            <span class="quality-badge badge-excellent">优秀</span>
+                        </div>
+                        <div class="creative-features">
+                            <ul><li>AR/VR技术实现游戏皮肤在真实环境或自拍中的虚拟试穿</li>
+<li>AI驱动动态特效叠加（如技能光效、角色动作）</li>
+<li>创建虚拟形象并穿戴皮肤进行短视频录制或直播</li>
+<li>皮肤搭配推荐与玩家穿搭分享社区</li></ul>
+                        </div>
+                        <div class="target-users">
+                            <strong>目标用户:</strong> 《王者荣耀》玩家、内容创作者、直播主播、年轻时尚群体
+                        </div>
+                        <div class="score-section">
+                            <div class="score-breakdown">
+                                <div class="score-bar">
+                                    <div class="score-fill score-fill-interest" style="width: 88%"></div>
+                                </div>
+                                <span>有趣度: 88/100</span>
+                            </div>
+                            <div class="score-breakdown">
+                                <div class="score-bar">
+                                    <div class="score-fill score-fill-useful" style="width: 70%"></div>
+                                </div>
+                                <span>有用度: 70/100</span>
+                            </div>
+                            <div class="total-score">综合评分: 84.4/100</div>
+                        </div>
+                    </div>
+                    
+                        </div>
+                    </div>
+                </section>
+                
+            </div>
+            
+
+            <div class="data-batch" data-hour="2026-01-21 15:00">
+                <div class="batch-header" style="margin: 2rem 0; padding-bottom: 0.5rem; border-bottom: 2px solid #e5e7eb;">
+                    <h2 style="color: #4b5563;">数据时间: 2026-01-21 15:33:51</h2>
+                </div>
+                
+                <section class="topic-section">
+                    <div class="topic-header">
+                        <span class="topic-rank">1</span>
+                        <div style="flex-grow: 1;">
+                            <h2 class="topic-title">10元一斤草莓和300元一斤草莓区别</h2>
+                            <span class="topic-label"></span>
+                            <span class="hot-value">1086993</span>
+                        </div>
+                    </div>
+
+                    <div class="timeline-section">
+                        <h4>事件脉络</h4>
+                        <ul class="timeline-list"></ul>
+                    </div>
+
+                    <div class="summary-section">
+                        <h4>热点详细信息</h4>
+                        <p>该微博热搜话题围绕“10元一斤草莓和300元一斤草莓区别”展开，主要探讨了不同价位草莓在品质、口感、产地、种植方式及消费者认知上的差异。讨论焦点包括高价草莓是否物有所值、价格差异背后的原因（如品种、有机种植、品牌溢价等），以及消费者如何根据自身需求进行选择。话题反映了当前消费市场对农产品品质分级的关注，以及消费者对“性价比”与“体验价值”的权衡。</p>
+                    </div>
+
+                    <div class="creative-section">
+                        <h4>产品创意 (AI/软件)</h4>
+                        <div class="creative-grid">
+                            
+                    <div class="creative-card excellent">
+                        <div class="creative-header">
+                            <h3 class="creative-name">莓果侦探AI</h3>
+                            <span class="quality-badge badge-excellent">优秀</span>
+                        </div>
+                        <div class="creative-features">
+                            <ul><li>通过手机摄像头扫描草莓，AI实时分析外观特征（颜色、形状、籽粒分布）并评估品级</li>
+<li>结合用户输入的价格，生成性价比分析报告与同类产品市场比价</li>
+<li>内置草莓品种数据库，提供种植方式、甜度、硬度等参数对比</li></ul>
+                        </div>
+                        <div class="target-users">
+                            <strong>目标用户:</strong> 生鲜消费者、水果采购员、美食爱好者
+                        </div>
+                        <div class="score-section">
+                            <div class="score-breakdown">
+                                <div class="score-bar">
+                                    <div class="score-fill score-fill-interest" style="width: 80%"></div>
+                                </div>
+                                <span>有趣度: 80/100</span>
+                            </div>
+                            <div class="score-breakdown">
+                                <div class="score-bar">
+                                    <div class="score-fill score-fill-useful" style="width: 85%"></div>
+                                </div>
+                                <span>有用度: 85/100</span>
+                            </div>
+                            <div class="total-score">综合评分: 81.0/100</div>
+                        </div>
+                    </div>
+                    
+                    <div class="creative-card excellent">
+                        <div class="creative-header">
+                            <h3 class="creative-name">虚拟果农乐园</h3>
+                            <span class="quality-badge badge-excellent">优秀</span>
+                        </div>
+                        <div class="creative-features">
+                            <ul><li>AI生成个性化虚拟草莓农场，用户可模拟种植不同品种草莓并观察生长过程</li>
+<li>内置经济系统，用户根据虚拟草莓的‘品质参数’（如甜度、大小）在模拟市场中定价交易</li>
+<li>接入真实市场数据，通过游戏化方式科普草莓品种、种植技术对价格的影响</li></ul>
+                        </div>
+                        <div class="target-users">
+                            <strong>目标用户:</strong> 休闲游戏玩家、亲子家庭、农业知识爱好者
+                        </div>
+                        <div class="score-section">
+                            <div class="score-breakdown">
+                                <div class="score-bar">
+                                    <div class="score-fill score-fill-interest" style="width: 90%"></div>
+                                </div>
+                                <span>有趣度: 90/100</span>
+                            </div>
+                            <div class="score-breakdown">
+                                <div class="score-bar">
+                                    <div class="score-fill score-fill-useful" style="width: 65%"></div>
+                                </div>
+                                <span>有用度: 65/100</span>
+                            </div>
+                            <div class="total-score">综合评分: 85.0/100</div>
+                        </div>
+                    </div>
+                    
+                        </div>
+                    </div>
+                </section>
+                
+                <section class="topic-section">
+                    <div class="topic-header">
+                        <span class="topic-rank">2</span>
+                        <div style="flex-grow: 1;">
+                            <h2 class="topic-title">男子献血2.2万毫升景区不免票被告</h2>
+                            <span class="topic-label"></span>
+                            <span class="hot-value">803783</span>
+                        </div>
+                    </div>
+
+                    <div class="timeline-section">
+                        <h4>事件脉络</h4>
+                        <ul class="timeline-list"></ul>
+                    </div>
+
+                    <div class="summary-section">
+                        <h4>热点详细信息</h4>
+                        <p>事件围绕一名男子因献血2.2万毫升后，在景区未能享受免票优惠而提起诉讼展开。核心争议点在于，献血者权益（如景区免票）的具体落实与执行标准可能存在模糊地带或地方差异，导致献血者的预期权益未能实现，从而引发法律纠纷。该事件折射出社会对献血者激励机制、权益保障透明度以及公共服务承诺兑现等问题的关注。</p>
+                    </div>
+
+                    <div class="creative-section">
+                        <h4>产品创意 (AI/软件)</h4>
+                        <div class="creative-grid">
+                            
+                    <div class="creative-card good">
+                        <div class="creative-header">
+                            <h3 class="creative-name">权益通AI助手</h3>
+                            <span class="quality-badge badge-good">良好</span>
+                        </div>
+                        <div class="creative-features">
+                            <ul><li>实时扫描各地献血权益政策（免票、优惠等）并结构化呈现</li>
+<li>AI自动匹配用户献血记录与适用权益，推送个性化提醒</li>
+<li>一键生成权益申诉材料，智能指导维权流程</li></ul>
+                        </div>
+                        <div class="target-users">
+                            <strong>目标用户:</strong> 定期献血者、权益意识较强的公益参与者
+                        </div>
+                        <div class="score-section">
+                            <div class="score-breakdown">
+                                <div class="score-bar">
+                                    <div class="score-fill score-fill-interest" style="width: 75%"></div>
+                                </div>
+                                <span>有趣度: 75/100</span>
+                            </div>
+                            <div class="score-breakdown">
+                                <div class="score-bar">
+                                    <div class="score-fill score-fill-useful" style="width: 90%"></div>
+                                </div>
+                                <span>有用度: 90/100</span>
+                            </div>
+                            <div class="total-score">综合评分: 78.0/100</div>
+                        </div>
+                    </div>
+                    
+                    <div class="creative-card excellent">
+                        <div class="creative-header">
+                            <h3 class="creative-name">热血足迹AR游戏</h3>
+                            <span class="quality-badge badge-excellent">优秀</span>
+                        </div>
+                        <div class="creative-features">
+                            <ul><li>基于LBS的AR游戏，将献血点、合作景区/商家转化为虚拟打卡点</li>
+<li>AI生成个性化热血英雄故事与勋章，分享至社交平台</li>
+<li>游戏化任务引导（如预约献血、邀请好友）解锁稀有权益或虚拟道具</li></ul>
+                        </div>
+                        <div class="target-users">
+                            <strong>目标用户:</strong> 年轻群体、游戏化公益参与者、社交分享爱好者
+                        </div>
+                        <div class="score-section">
+                            <div class="score-breakdown">
+                                <div class="score-bar">
+                                    <div class="score-fill score-fill-interest" style="width: 95%"></div>
+                                </div>
+                                <span>有趣度: 95/100</span>
+                            </div>
+                            <div class="score-breakdown">
+                                <div class="score-bar">
+                                    <div class="score-fill score-fill-useful" style="width: 65%"></div>
+                                </div>
+                                <span>有用度: 65/100</span>
+                            </div>
+                            <div class="total-score">综合评分: 89.0/100</div>
+                        </div>
+                    </div>
+                    
+                        </div>
+                    </div>
+                </section>
+                
+                <section class="topic-section">
+                    <div class="topic-header">
+                        <span class="topic-rank">3</span>
+                        <div style="flex-grow: 1;">
+                            <h2 class="topic-title">五个新概括2025年经济工作成绩单</h2>
+                            <span class="topic-label"></span>
+                            <span class="hot-value">620842</span>
+                        </div>
+                    </div>
+
+                    <div class="timeline-section">
+                        <h4>事件脉络</h4>
+                        <ul class="timeline-list"></ul>
+                    </div>
+
+                    <div class="summary-section">
+                        <h4>热点详细信息</h4>
+                        <p>该热搜话题聚焦于对2025年经济工作的总结，核心内容是用“五个新”来概括年度经济成就。这“五个新”可能指代经济领域在结构、动能、质量、开放或民生等方面取得的新进展、新突破或新面貌，是对全年经济工作成果的高度凝练。话题引发了公众对国家经济发展态势的关注与讨论，反映了社会对宏观经济运行情况的普遍关心。由于搜索结果未提供具体事件发生日期，此处不作时间推断。</p>
+                    </div>
+
+                    <div class="creative-section">
+                        <h4>产品创意 (AI/软件)</h4>
+                        <div class="creative-grid">
+                            
+                    <div class="creative-card good">
+                        <div class="creative-header">
+                            <h3 class="creative-name">经济成就AI解读官</h3>
+                            <span class="quality-badge badge-good">良好</span>
+                        </div>
+                        <div class="creative-features">
+                            <ul><li>基于‘五个新’等官方经济表述，利用NLP技术生成可视化、故事化的解读报告（如动态图表、短视频）</li>
+<li>内置问答机器人，允许用户用自然语言提问（如‘第三个新具体指什么？’‘对我行业有何影响？’），提供个性化、通俗化的解答</li></ul>
+                        </div>
+                        <div class="target-users">
+                            <strong>目标用户:</strong> 关心宏观经济但非专业出身的普通公众、学生、中小企业主
+                        </div>
+                        <div class="score-section">
+                            <div class="score-breakdown">
+                                <div class="score-bar">
+                                    <div class="score-fill score-fill-interest" style="width: 80%"></div>
+                                </div>
+                                <span>有趣度: 80/100</span>
+                            </div>
+                            <div class="score-breakdown">
+                                <div class="score-bar">
+                                    <div class="score-fill score-fill-useful" style="width: 75%"></div>
+                                </div>
+                                <span>有用度: 75/100</span>
+                            </div>
+                            <div class="total-score">综合评分: 79.0/100</div>
+                        </div>
+                    </div>
+                    
+                    <div class="creative-card excellent">
+                        <div class="creative-header">
+                            <h3 class="creative-name">我的经济影响力模拟器</h3>
+                            <span class="quality-badge badge-excellent">优秀</span>
+                        </div>
+                        <div class="creative-features">
+                            <ul><li>用户输入个人或家庭的基本财务数据（如收入、消费结构、投资情况），AI模拟‘五个新’代表的宏观变化（如新动能、新消费）对其财务未来的潜在影响</li>
+<li>生成个性化的‘经济成绩单’与趋势预测报告，并提供适配的、可操作的建议（如调整消费方向、关注新兴行业机会）</li></ul>
+                        </div>
+                        <div class="target-users">
+                            <strong>目标用户:</strong> 有理财规划需求的个人、家庭，以及对个人发展与宏观经济关联感兴趣的年轻职场人
+                        </div>
+                        <div class="score-section">
+                            <div class="score-breakdown">
+                                <div class="score-bar">
+                                    <div class="score-fill score-fill-interest" style="width: 85%"></div>
+                                </div>
+                                <span>有趣度: 85/100</span>
+                            </div>
+                            <div class="score-breakdown">
+                                <div class="score-bar">
+                                    <div class="score-fill score-fill-useful" style="width: 80%"></div>
+                                </div>
+                                <span>有用度: 80/100</span>
+                            </div>
+                            <div class="total-score">综合评分: 84.0/100</div>
+                        </div>
+                    </div>
+                    
+                        </div>
+                    </div>
+                </section>
+                
+                <section class="topic-section">
+                    <div class="topic-header">
+                        <span class="topic-rank">4</span>
+                        <div style="flex-grow: 1;">
+                            <h2 class="topic-title">山上彻也哥哥自杀后萌生报复念头</h2>
+                            <span class="topic-label"></span>
+                            <span class="hot-value">534325</span>
+                        </div>
+                    </div>
+
+                    <div class="timeline-section">
+                        <h4>事件脉络</h4>
+                        <ul class="timeline-list"></ul>
+                    </div>
+
+                    <div class="summary-section">
+                        <h4>热点详细信息</h4>
+                        <p>该话题涉及山上彻也因其哥哥自杀而萌生报复念头的事件。搜索结果中未提供具体时间信息，因此无法构建详细时间线。事件核心是个人因亲属自杀而产生极端心理变化，最终导致报复行为。这反映了心理健康危机干预、家庭支持系统缺失等社会问题，也凸显了个人心理创伤可能引发的严重后果。</p>
+                    </div>
+
+                    <div class="creative-section">
+                        <h4>产品创意 (AI/软件)</h4>
+                        <div class="creative-grid">
+                            
+                    <div class="creative-card good">
+                        <div class="creative-header">
+                            <h3 class="creative-name">心理危机预警AI助手</h3>
+                            <span class="quality-badge badge-good">良好</span>
+                        </div>
+                        <div class="creative-features">
+                            <ul><li>基于自然语言处理分析社交媒体/聊天记录中的负面情绪和极端言论</li>
+<li>建立个人心理风险画像并实时监测变化趋势</li>
+<li>当检测到高风险信号时自动触发分级预警（向本人推送心理资源/向紧急联系人发送提醒）</li>
+<li>提供AI心理疏导对话和本地专业心理咨询机构一键转接</li></ul>
+                        </div>
+                        <div class="target-users">
+                            <strong>目标用户:</strong> 有潜在心理危机风险的个人及其家属、社区心理健康工作者、企业员工关怀部门
+                        </div>
+                        <div class="score-section">
+                            <div class="score-breakdown">
+                                <div class="score-bar">
+                                    <div class="score-fill score-fill-interest" style="width: 75%"></div>
+                                </div>
+                                <span>有趣度: 75/100</span>
+                            </div>
+                            <div class="score-breakdown">
+                                <div class="score-bar">
+                                    <div class="score-fill score-fill-useful" style="width: 90%"></div>
+                                </div>
+                                <span>有用度: 90/100</span>
+                            </div>
+                            <div class="total-score">综合评分: 78.0/100</div>
+                        </div>
+                    </div>
+                    
+                    <div class="creative-card excellent">
+                        <div class="creative-header">
+                            <h3 class="creative-name">创伤叙事重构游戏</h3>
+                            <span class="quality-badge badge-excellent">优秀</span>
+                        </div>
+                        <div class="creative-features">
+                            <ul><li>利用生成式AI将用户输入的个人创伤经历转化为互动故事框架</li>
+<li>在安全虚拟环境中提供多种故事走向选择，引导用户探索不同应对方式</li>
+<li>通过AI生成隐喻性角色和情节，帮助用户间接处理痛苦记忆</li>
+<li>游戏结束后生成‘心理韧性报告’并提供基于游戏行为的个性化建议</li></ul>
+                        </div>
+                        <div class="target-users">
+                            <strong>目标用户:</strong> 经历创伤事件（如亲友离世、重大挫折）后需要心理调适的成年人、对叙事疗法感兴趣的用户
+                        </div>
+                        <div class="score-section">
+                            <div class="score-breakdown">
+                                <div class="score-bar">
+                                    <div class="score-fill score-fill-interest" style="width: 88%"></div>
+                                </div>
+                                <span>有趣度: 88/100</span>
+                            </div>
+                            <div class="score-breakdown">
+                                <div class="score-bar">
+                                    <div class="score-fill score-fill-useful" style="width: 80%"></div>
+                                </div>
+                                <span>有用度: 80/100</span>
+                            </div>
+                            <div class="total-score">综合评分: 86.4/100</div>
+                        </div>
+                    </div>
+                    
+                        </div>
+                    </div>
+                </section>
+                
+                <section class="topic-section">
+                    <div class="topic-header">
+                        <span class="topic-rank">5</span>
+                        <div style="flex-grow: 1;">
+                            <h2 class="topic-title">王昭君新皮肤长夜焕生</h2>
+                            <span class="topic-label"></span>
+                            <span class="hot-value">414580</span>
+                        </div>
+                    </div>
+
+                    <div class="timeline-section">
+                        <h4>事件脉络</h4>
+                        <ul class="timeline-list"></ul>
+                    </div>
+
+                    <div class="summary-section">
+                        <h4>热点详细信息</h4>
+                        <p>该话题涉及《王者荣耀》英雄王昭君的新皮肤“长夜焕生”。从话题名称推测，这很可能是一款以“长夜”或“焕生”为主题，可能带有神话、幻想或暗夜风格的全新皮肤。作为游戏内的重要更新内容，通常会引发玩家社区对皮肤设计、特效、获取方式及上线时间的广泛讨论与期待。此类话题热度通常与官方预告、玩家实机演示视频的发布以及皮肤正式上线的时间点紧密相关。</p>
+                    </div>
+
+                    <div class="creative-section">
+                        <h4>产品创意 (AI/软件)</h4>
+                        <div class="creative-grid">
+                            
+                    <div class="creative-card excellent">
+                        <div class="creative-header">
+                            <h3 class="creative-name">AI皮肤设计师</h3>
+                            <span class="quality-badge badge-excellent">优秀</span>
+                        </div>
+                        <div class="creative-features">
+                            <ul><li>用户可输入关键词（如“长夜焕生”、“冰雪女神”）或上传草图，AI生成多款王昭君或其他英雄的原创皮肤概念图</li>
+<li>AI根据用户偏好（色彩、风格、元素）对生成的概念图进行迭代优化</li>
+<li>生成皮肤配套的局内技能特效动画预览</li>
+<li>社区分享与投票功能，优秀设计有机会被官方看到</li></ul>
+                        </div>
+                        <div class="target-users">
+                            <strong>目标用户:</strong> 《王者荣耀》玩家、游戏美术爱好者、同人创作者
+                        </div>
+                        <div class="score-section">
+                            <div class="score-breakdown">
+                                <div class="score-bar">
+                                    <div class="score-fill score-fill-interest" style="width: 90%"></div>
+                                </div>
+                                <span>有趣度: 90/100</span>
+                            </div>
+                            <div class="score-breakdown">
+                                <div class="score-bar">
+                                    <div class="score-fill score-fill-useful" style="width: 75%"></div>
+                                </div>
+                                <span>有用度: 75/100</span>
+                            </div>
+                            <div class="total-score">综合评分: 87.0/100</div>
+                        </div>
+                    </div>
+                    
+                    <div class="creative-card excellent">
+                        <div class="creative-header">
+                            <h3 class="creative-name">虚拟偶像皮肤体验馆</h3>
+                            <span class="quality-badge badge-excellent">优秀</span>
+                        </div>
+                        <div class="creative-features">
+                            <ul><li>基于AI驱动的王昭君“长夜焕生”皮肤虚拟形象，可与用户进行实时语音或文字互动</li>
+<li>用户可自定义互动场景（如冰雪宫殿、暗夜森林），并与虚拟形象合影、录制短视频</li>
+<li>AI根据皮肤背景故事生成互动剧情任务，用户通过对话解锁新剧情和专属表情动作</li>
+<li>集成AR功能，可将虚拟形象投射到现实环境中进行互动拍照</li></ul>
+                        </div>
+                        <div class="target-users">
+                            <strong>目标用户:</strong> 《王者荣耀》IP粉丝、虚拟偶像爱好者、喜欢互动娱乐的年轻用户
+                        </div>
+                        <div class="score-section">
+                            <div class="score-breakdown">
+                                <div class="score-bar">
+                                    <div class="score-fill score-fill-interest" style="width: 88%"></div>
+                                </div>
+                                <span>有趣度: 88/100</span>
+                            </div>
+                            <div class="score-breakdown">
+                                <div class="score-bar">
+                                    <div class="score-fill score-fill-useful" style="width: 70%"></div>
+                                </div>
+                                <span>有用度: 70/100</span>
+                            </div>
+                            <div class="total-score">综合评分: 84.4/100</div>
+                        </div>
+                    </div>
+                    
+                        </div>
+                    </div>
+                </section>
+                
+            </div>
+            
+            
+            <!-- Example Topic Section (kept for structure reference, but hidden/replaced by script) -->
+            <section class="topic-section" style="display:none">
+                <div class="topic-header">
+                    <span class="topic-rank">1</span>
+                    <h2 class="topic-title">示例话题</h2>
+                    <span class="topic-label">热</span>
+                    <span class="hot-value">1.2亿</span>
+                </div>
+                <div class="summary-section">
+                    <p>等待数据生成...</p>
+                </div>
+            </section>
+        </div>
+
+        <!-- Recommendations -->
+        <section class="recommendations">
+            <h3>推荐优先级</h3>
+            
+            <div class="recommendation-item">
+                <h4>1. 热点经济学人 (综合评分: 87.0)</h4>
+                <p>来自话题: 五个新概括2025年经济工作成绩单</p>
+            </div>
+            
+
+            <div class="recommendation-item">
+                <h4>2. AI皮肤试妆与风格迁移助手 (综合评分: 87.0)</h4>
+                <p>来自话题: 王昭君新皮肤长夜焕生</p>
+            </div>
+            
+
+            <div class="recommendation-item">
+                <h4>3. AI水果美学馆 (综合评分: 85.0)</h4>
+                <p>来自话题: 车厘子降价后黑草莓成水果新贵</p>
+            </div>
+            </section>
+
+        <!-- Methodology -->
+        <section class="topic-section">
+            <h3>评估方法</h3>
+            <p><strong>综合评分计算:</strong> (有趣度 × 0.8) + (有用度 × 0.2)</p>
+            <p><strong>评级标准:</strong></p>
+            <ul class="timeline-list">
+                <li>优秀 (≥80分): 高娱乐价值或强实用性，市场潜力大</li>
+                <li>良好 (60-79分): 有一定价值，但需要优化或细分市场</li>
+                <li>需要改进 (<60分): 价值有限，建议重新构思</li>
+            </ul>
+            <p><strong>数据来源:</strong> 天行数据微博热搜API + 网络搜索补充信息</p>
+        </section>
+
+        <!-- Footer -->
+        <footer class="footer">
+            <p>本报告由Weibo Hotspot Analysis Skill自动生成 • 仅供内部创意讨论使用</p>
+            <p>生成时间: 2026-01-19 23:45:00 • 版本: 1.0</p>
+        </footer>
+    </div>
+    <script>
+        function filterData() {
+            const selectedHour = document.getElementById('timeFilter').value;
+            const batches = document.querySelectorAll('.data-batch');
+            
+            batches.forEach(batch => {
+                if (selectedHour === 'all' || batch.dataset.hour === selectedHour) {
+                    batch.style.display = 'block';
+                } else {
+                    batch.style.display = 'none';
+                }
+            });
+        }
+        
+        // Initialize: Select the first option (latest) by default if not 'all'
+        window.onload = function() {
+            const select = document.getElementById('timeFilter');
+            if (select.options.length > 1) {
+                // Select the first real option (latest data)
+                select.selectedIndex = 1; 
+                filterData();
+            }
+        };
+    </script>
+</body>
+</html>
