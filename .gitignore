@@ -4,4 +4,5 @@ __pycache__/
 .DS_Store
 weibo_analysis_report.html
 history_data.json
+history_data_douyin.json
 example_data.json

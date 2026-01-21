@@ -15,12 +15,7 @@ async def scheduled_analysis():
         print("Starting scheduled analysis task...")
         try:
             # Run the synchronous analysis in a thread pool
-            # 1. Fetch
-            await asyncio.to_thread(analyzer.fetch_hot_searches, True) # use_api=True
-            # 2. Analyze
-            await asyncio.to_thread(analyzer.analyze_topics)
-            # 3. Generate Report
-            await asyncio.to_thread(analyzer.generate_html_report)
+            await asyncio.to_thread(analyzer.run_full_analysis_cycle, True)
             print("Analysis task complete. Report updated.")
         except Exception as e:
             print(f"Error during scheduled analysis: {e}")

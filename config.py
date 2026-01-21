@@ -9,6 +9,8 @@ class Config:
 
     # Weibo API
     TIANAPI_KEY = os.getenv("TIANAPI_KEY", "6e333e2407e88821ce16a6a8cba513e8")
+    WEIBO_API_URL = "https://apis.tianapi.com/weibohot/index"
+    DOUYIN_API_URL = "https://apis.tianapi.com/douyinhot/index"
     
     # LLM Configuration
     LLM_API_KEY = os.getenv("LLM_API_KEY")

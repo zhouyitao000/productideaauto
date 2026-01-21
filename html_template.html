@@ -17,6 +17,7 @@
             --color-text: #111827;
             --color-text-secondary: #6b7280;
             --color-border: #e5e7eb;
+            --color-favorite: #facc15; /* Yellow for star */
             --spacing-unit: 1rem;
             --border-radius: 0.5rem;
             --shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
@@ -43,6 +44,43 @@
             display: flex;
             flex-direction: column;
             gap: 2rem;
+        }
+
+        /* Tabs */
+        .tabs {
+            display: flex;
+            gap: 1rem;
+            border-bottom: 2px solid var(--color-border);
+            margin-bottom: 1rem;
+        }
+
+        .tab-btn {
+            padding: 1rem 2rem;
+            background: none;
+            border: none;
+            border-bottom: 3px solid transparent;
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: var(--color-text-secondary);
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .tab-btn:hover {
+            color: var(--color-text);
+        }
+
+        .tab-btn.active {
+            color: var(--color-excellent);
+            border-bottom-color: var(--color-excellent);
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
         }
 
         /* Header */
@@ -162,12 +200,14 @@
         }
 
         /* Timeline (Removed in script, but style kept for rubric list) */
+        .summary-section {
+            margin-bottom: 3rem;
+        }
+
         .summary-section h4, .creative-section h4 {
             font-size: 1.2rem;
             margin-bottom: 1rem;
             color: var(--color-text);
-            padding-bottom: 0.5rem;
-            border-bottom: 1px solid var(--color-border);
         }
 
         .timeline-list {
@@ -204,15 +244,7 @@
             padding: 1.5rem;
             border-radius: var(--border-radius);
             box-shadow: var(--shadow);
-            border-top: 4px solid var(--color-excellent);
-        }
-
-        .creative-card.good {
-            border-top-color: var(--color-good);
-        }
-
-        .creative-card.needs-improvement {
-            border-top-color: var(--color-needs-improvement);
+            border: 1px solid var(--color-border);
         }
 
         .creative-header {
@@ -226,27 +258,6 @@
             font-size: 1.25rem;
             font-weight: bold;
             color: var(--color-text);
-        }
-
-        .quality-badge {
-            display: inline-block;
-            padding: 0.25rem 0.75rem;
-            border-radius: 1rem;
-            font-size: 0.8rem;
-            font-weight: 600;
-            color: white;
-        }
-
-        .badge-excellent {
-            background-color: var(--color-excellent);
-        }
-
-        .badge-good {
-            background-color: var(--color-good);
-        }
-
-        .badge-needs-improvement {
-            background-color: var(--color-needs-improvement);
         }
 
         .creative-features {
@@ -421,22 +432,92 @@
             font-size: 1rem;
             min-width: 200px;
         }
+
+        /* Favorite Button */
+        .fav-btn {
+            background: none;
+            border: 1px solid var(--color-border);
+            border-radius: 4px;
+            padding: 0.25rem 0.5rem;
+            cursor: pointer;
+            color: var(--color-text-secondary);
+            font-size: 0.9rem;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 0.25rem;
+        }
+        
+        .fav-btn:hover {
+            background-color: var(--color-background);
+            color: var(--color-text);
+        }
+        
+        .fav-btn.active {
+            color: var(--color-favorite);
+            border-color: var(--color-favorite);
+            background-color: #fffbeb;
+        }
+        
+        .fav-btn.active .fav-icon {
+            content: "★";
+        }
+        
+        /* Favorites List */
+        .fav-item {
+            background: var(--color-surface);
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow);
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            border-left: 4px solid var(--color-favorite);
+        }
+        
+        .fav-meta {
+            display: flex;
+            justify-content: space-between;
+            color: var(--color-text-secondary);
+            font-size: 0.85rem;
+            margin-bottom: 0.5rem;
+            border-bottom: 1px solid var(--color-border);
+            padding-bottom: 0.5rem;
+        }
+        
+        .fav-source-tag {
+            padding: 2px 6px;
+            border-radius: 4px;
+            background: var(--color-border);
+            font-weight: bold;
+        }
+        
+        .fav-content {
+            margin-top: 1rem;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 3rem;
+            color: var(--color-text-secondary);
+        }
     </style>
 </head>
 <body>
     <div class="container">
-        <!-- Header -->
-        <header class="header">
-            <h1>微博热搜产品创意分析报告</h1>
-            <div class="subtitle">基于实时热搜榜单的创意挖掘与评估</div>
+        <div class="header">
+            <h1>微博/抖音热搜产品创意分析报告</h1>
+            <p class="subtitle">基于 AI 自动分析热点话题并生成产品创意方案</p>
             <div class="metadata">
-                <div>生成时间: <strong>2026-01-19 23:45:00</strong></div>
-                <div>分析主题数: <strong>5</strong></div>
-                <div>数据来源: <strong>天行数据API</strong></div>
+                <span>📅 更新时间: <!-- UPDATE_TIME_PLACEHOLDER --></span>
+                <span>🤖 分析模型: GPT-3.5-Turbo</span>
             </div>
-        </header>
+        </div>
 
-        <!-- Filter Bar -->
+        <div class="tabs">
+            <button class="tab-btn active" onclick="openTab(event, 'weibo')">微博热搜</button>
+            <button class="tab-btn" onclick="openTab(event, 'douyin')">抖音热搜</button>
+            <button class="tab-btn" onclick="openTab(event, 'favorites')">⭐ 我收藏的创意</button>
+        </div>
+
         <div class="filter-bar">
             <label for="timeFilter">选择数据时间:</label>
             <select id="timeFilter" onchange="filterData()">
@@ -445,63 +526,78 @@
             </select>
         </div>
 
+        <div id="weibo" class="tab-content active">
+            <!-- Topic Analysis Sections -->
+            <div id="contentAreaWeibo">
+                <!-- WEIBO_CONTENT_PLACEHOLDER -->
+            </div>
+        </div>
 
+        <div id="douyin" class="tab-content">
+            <!-- Topic Analysis Sections -->
+            <div id="contentAreaDouyin">
+                <!-- DOUYIN_CONTENT_PLACEHOLDER -->
+            </div>
+        </div>
 
-        <!-- Topic Analysis Sections -->
-        <div id="contentArea">
-            <!-- CONTENT_PLACEHOLDER -->
-            
-            <!-- Example Topic Section (kept for structure reference, but hidden/replaced by script) -->
-            <section class="topic-section" style="display:none">
-                <div class="topic-header">
-                    <span class="topic-rank">1</span>
-                    <h2 class="topic-title">示例话题</h2>
-                    <span class="topic-label">热</span>
-                    <span class="hot-value">1.2亿</span>
-                </div>
-                <div class="summary-section">
-                    <p>等待数据生成...</p>
-                </div>
-            </section>
+        <div id="favorites" class="tab-content">
+            <div id="favoritesList" class="creative-grid" style="display: block;">
+                <!-- JS Populated -->
+            </div>
         </div>
 
         <!-- Recommendations -->
-        <section class="recommendations">
-            <h3>推荐优先级</h3>
-            <div class="recommendation-item">
-                <h4>1. 红包故事生成器 (综合评分: 82)</h4>
-                <p>高娱乐性与社交传播潜力，适合春节期间的病毒式营销。</p>
-            </div>
-            <div class="recommendation-item">
-                <h4>2. AI歌手互动平台 (综合评分: 80)</h4>
-                <p>结合AI技术与音乐娱乐，满足年轻用户的好奇心。</p>
-            </div>
-            <div class="recommendation-item">
-                <h4>3. 新能源汽车比价工具 (综合评分: 78)</h4>
-                <p>实用性强，解决消费者在价格战中的信息不对称问题。</p>
-            </div>
-        </section>
-
-        <!-- Methodology -->
         <section class="topic-section">
-            <h3>评估方法</h3>
-            <p><strong>综合评分计算:</strong> (有趣度 × 0.8) + (有用度 × 0.2)</p>
-            <p><strong>评级标准:</strong></p>
-            <ul class="timeline-list">
-                <li>优秀 (≥80分): 高娱乐价值或强实用性，市场潜力大</li>
-                <li>良好 (60-79分): 有一定价值，但需要优化或细分市场</li>
-                <li>需要改进 (<60分): 价值有限，建议重新构思</li>
-            </ul>
-            <p><strong>数据来源:</strong> 天行数据微博热搜API + 网络搜索补充信息</p>
+            <div class="topic-header">
+                <div style="flex-grow: 1;">
+                    <h2 class="topic-title">✨ 今日最佳创意推荐</h2>
+                </div>
+            </div>
+            <div class="creative-grid">
+                <!-- RECOMMENDATIONS_PLACEHOLDER -->
+            </div>
         </section>
-
-        <!-- Footer -->
-        <footer class="footer">
-            <p>本报告由Weibo Hotspot Analysis Skill自动生成 • 仅供内部创意讨论使用</p>
-            <p>生成时间: 2026-01-19 23:45:00 • 版本: 1.0</p>
-        </footer>
     </div>
+
     <script>
+        // Initialize favorites from localStorage
+        let favorites = JSON.parse(localStorage.getItem('productIdeaFavorites')) || [];
+
+        // Check favorites on load
+        document.addEventListener('DOMContentLoaded', function() {
+            updateFavoriteButtons();
+        });
+
+        function openTab(evt, tabName) {
+            var i, tabcontent, tablinks;
+            tabcontent = document.getElementsByClassName("tab-content");
+            for (i = 0; i < tabcontent.length; i++) {
+                tabcontent[i].className = tabcontent[i].className.replace(" active", "");
+                // Reset display style
+                tabcontent[i].style.display = ""; 
+                if (!tabcontent[i].classList.contains('active')) {
+                     tabcontent[i].style.display = "none";
+                }
+            }
+            tablinks = document.getElementsByClassName("tab-btn");
+            for (i = 0; i < tablinks.length; i++) {
+                tablinks[i].className = tablinks[i].className.replace(" active", "");
+            }
+            
+            document.getElementById(tabName).style.display = "block";
+            document.getElementById(tabName).className += " active";
+            evt.currentTarget.className += " active";
+
+            // Hide filter bar on favorites tab
+            const filterBar = document.getElementById('filterBarContainer');
+            if (tabName === 'favorites') {
+                if(filterBar) filterBar.style.display = 'none';
+                renderFavorites();
+            } else {
+                if(filterBar) filterBar.style.display = 'flex';
+            }
+        }
+
         function filterData() {
             const selectedHour = document.getElementById('timeFilter').value;
             const batches = document.querySelectorAll('.data-batch');
@@ -514,16 +610,109 @@
                 }
             });
         }
-        
-        // Initialize: Select the first option (latest) by default if not 'all'
-        window.onload = function() {
-            const select = document.getElementById('timeFilter');
-            if (select.options.length > 1) {
-                // Select the first real option (latest data)
-                select.selectedIndex = 1; 
-                filterData();
+
+        function toggleFavorite(btn, data) {
+            const index = favorites.findIndex(f => f.id === data.id);
+            
+            if (index === -1) {
+                // Add to favorites
+                data.savedAt = new Date().getTime();
+                favorites.unshift(data); // Add to beginning
+                btn.classList.add('active');
+                btn.innerHTML = '<span class="fav-icon">★</span> 已收藏';
+            } else {
+                // Remove from favorites
+                favorites.splice(index, 1);
+                btn.classList.remove('active');
+                btn.innerHTML = '<span class="fav-icon">☆</span> 收藏';
+                
+                // If on favorites tab, re-render immediately
+                const favoritesTab = document.getElementById('favorites');
+                if (favoritesTab.classList.contains('active')) {
+                    renderFavorites();
+                }
             }
-        };
+            
+            localStorage.setItem('productIdeaFavorites', JSON.stringify(favorites));
+            
+            // Sync other buttons with same ID (if any)
+            updateFavoriteButtons();
+        }
+
+        function updateFavoriteButtons() {
+            const buttons = document.querySelectorAll('.fav-btn');
+            buttons.forEach(btn => {
+                // Get the parent card to find the ID, or parsing onclick attribute is hard
+                // We stored data-id on the card
+                const card = btn.closest('.creative-card');
+                if (card) {
+                    const id = card.dataset.id;
+                    const isFav = favorites.some(f => f.id === id);
+                    if (isFav) {
+                        btn.classList.add('active');
+                        btn.innerHTML = '<span class="fav-icon">★</span> 已收藏';
+                    } else {
+                        btn.classList.remove('active');
+                        btn.innerHTML = '<span class="fav-icon">☆</span> 收藏';
+                    }
+                }
+            });
+        }
+
+        function renderFavorites() {
+            const container = document.getElementById('favoritesList');
+            if (favorites.length === 0) {
+                container.innerHTML = '<div class="empty-state"><p>还没有收藏任何创意，去热搜列表看看吧！</p></div>';
+                return;
+            }
+
+            // Sort by savedAt descending
+            favorites.sort((a, b) => b.savedAt - a.savedAt);
+
+            const html = favorites.map(item => {
+                const date = new Date(item.savedAt).toLocaleString();
+                const featuresHtml = item.features.map(f => `<li>${f}</li>`).join('');
+                const scores = item.scores || {interest: 0, usefulness: 0, total: 0};
+                
+                return `
+                <div class="fav-item">
+                    <div class="fav-meta">
+                        <div>
+                            <span class="fav-source-tag">${item.source === 'weibo' ? '微博' : '抖音'}</span>
+                            <span style="margin-left: 0.5rem; font-weight: bold;">${item.topic_title}</span>
+                            <span style="margin-left: 0.5rem; color: #ef4444;">🔥 ${item.hot_value}</span>
+                        </div>
+                        <div>
+                            <span>原数据: ${item.time}</span> | 
+                            <span>收藏于: ${date}</span>
+                        </div>
+                    </div>
+                    
+                    <div class="creative-header" style="margin-top: 1rem;">
+                        <h3 class="creative-name">${item.name}</h3>
+                        <button class="fav-btn active" onclick='toggleFavorite(this, ${JSON.stringify(item)})'>
+                            <span class="fav-icon">★</span> 取消收藏
+                        </button>
+                    </div>
+                    
+                    <div class="creative-features">
+                        <ul>${featuresHtml}</ul>
+                    </div>
+                    
+                    <div class="score-section">
+                        <div class="total-score" style="text-align: left; font-size: 1.2rem;">
+                            综合评分: ${scores.total.toFixed(1)}/100 
+                            <span style="font-size: 0.9rem; font-weight: normal; color: #6b7280;">
+                                (有趣: ${scores.interest} | 有用: ${scores.usefulness})
+                            </span>
+                        </div>
+                    </div>
+                </div>
+                `;
+            }).join('');
+            
+            container.innerHTML = html;
+        }
     </script>
 </body>
 </html>

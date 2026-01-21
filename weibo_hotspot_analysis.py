@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-Weibo Hotspot Analysis Script (Optimized)
+Weibo & Douyin Hotspot Analysis Script
 """
 
 import json
@@ -14,25 +14,23 @@ import requests
 import concurrent.futures
 from config import Config
 from providers import get_search_provider, get_llm_provider
-
 import time
 import shutil
 
 # Constants
-API_URL = "https://apis.tianapi.com/weibohot/index"
-EXAMPLE_DATA_FILE = os.path.join(Config.BASE_DIR, "example_data.json")
-HISTORY_DATA_FILE = os.path.join(Config.BASE_DIR, "history_data.json")
+HISTORY_DATA_WEIBO_FILE = os.path.join(Config.BASE_DIR, "history_data.json")
+HISTORY_DATA_DOUYIN_FILE = os.path.join(Config.BASE_DIR, "history_data_douyin.json")
 HTML_TEMPLATE_FILE = os.path.join(Config.BASE_DIR, "html_template.html")
 
 class WeiboHotspotAnalyzer:
-    """Main analyzer class for Weibo hot search data."""
+    """Main analyzer class for Weibo and Douyin hot search data."""
 
     def __init__(self, api_key: str = Config.TIANAPI_KEY):
         self.api_key = api_key
-        self.hot_searches = []
-        # self.analysis_results will now hold the current batch results
-        self.analysis_results = []
-        self.history_data = self._load_history_data()
+        
+        # Load histories
+        self.history_weibo = self._load_history_data(HISTORY_DATA_WEIBO_FILE)
+        self.history_douyin = self._load_history_data(HISTORY_DATA_DOUYIN_FILE)
         
         # Initialize providers
         self.search_provider = get_search_provider(Config)
@@ -41,33 +39,56 @@ class WeiboHotspotAnalyzer:
         print(f"Initialized with Search Provider: {type(self.search_provider).__name__}")
         print(f"Initialized with LLM Provider: {type(self.llm_provider).__name__}")
 
-    def _load_history_data(self) -> List[Dict[str, Any]]:
+    def _load_history_data(self, filepath: str) -> List[Dict[str, Any]]:
         """Load historical data from JSON file."""
-        if os.path.exists(HISTORY_DATA_FILE):
+        if os.path.exists(filepath):
             try:
-                with open(HISTORY_DATA_FILE, 'r', encoding='utf-8') as f:
+                with open(filepath, 'r', encoding='utf-8') as f:
                     return json.load(f)
             except Exception as e:
-                print(f"Failed to load history data: {e}")
+                print(f"Failed to load history data from {filepath}: {e}")
                 return []
         return []
 
-    def _save_history_data(self):
+    def _save_history_data(self, data: List[Dict], filepath: str):
         """Save updated history data to JSON file."""
         try:
-            with open(HISTORY_DATA_FILE, 'w', encoding='utf-8') as f:
-                json.dump(self.history_data, f, ensure_ascii=False, indent=2)
-            print(f"History data saved to {HISTORY_DATA_FILE}")
+            with open(filepath, 'w', encoding='utf-8') as f:
+                json.dump(data, f, ensure_ascii=False, indent=2)
+            print(f"History data saved to {filepath}")
         except Exception as e:
-            print(f"Failed to save history data: {e}")
+            print(f"Failed to save history data to {filepath}: {e}")
 
-    def fetch_hot_searches(self, use_api: bool = True) -> List[Dict[str, Any]]:
-        """Fetch Weibo hot search data from API or example file."""
+    def run_full_analysis_cycle(self, use_api: bool = True):
+        """Run the full analysis cycle for both Weibo and Douyin."""
+        print("\n=== Starting Full Analysis Cycle ===")
+        
+        # 1. Weibo Analysis
+        print("--- Fetching & Analyzing Weibo Data ---")
+        weibo_topics = self.fetch_hot_searches(source="weibo", use_api=use_api)
+        if weibo_topics:
+            self.analyze_topics(weibo_topics, source="weibo")
+        
+        # 2. Douyin Analysis
+        print("--- Fetching & Analyzing Douyin Data ---")
+        douyin_topics = self.fetch_hot_searches(source="douyin", use_api=use_api)
+        if douyin_topics:
+            self.analyze_topics(douyin_topics, source="douyin")
+            
+        # 3. Generate Report
+        print("--- Generating Report ---")
+        self.generate_html_report()
+        print("=== Cycle Complete ===\n")
+
+    def fetch_hot_searches(self, source: str = "weibo", use_api: bool = True) -> List[Dict[str, Any]]:
+        """Fetch hot search data from API or example file."""
         if use_api:
             try:
-                print(f"Calling TianAPI with key: {self.api_key[:4]}***")
+                url = Config.WEIBO_API_URL if source == "weibo" else Config.DOUYIN_API_URL
+                print(f"Calling TianAPI ({source}) with key: {self.api_key[:4]}***")
+                
                 response = requests.get(
-                    API_URL,
+                    url,
                     params={"key": self.api_key},
                     timeout=10
                 )
@@ -76,54 +97,62 @@ class WeiboHotspotAnalyzer:
 
                 if data.get("code") != 200:
                     print(f"API returned error: {data.get('msg', 'Unknown error')}")
-                    return self._load_example_data()
+                    return self._load_example_data(source)
 
                 # Extract and normalize data
                 raw_items = data.get("result", {}).get("list", [])
-                self.hot_searches = self._normalize_items(raw_items)
-                print(f"Successfully fetched {len(self.hot_searches)} hot search items from API")
+                normalized_items = self._normalize_items(raw_items, source)
+                print(f"Successfully fetched {len(normalized_items)} {source} items from API")
+                return normalized_items
 
             except Exception as e:
                 print(f"API call failed: {e}")
                 print("Falling back to example data")
-                return self._load_example_data()
+                return self._load_example_data(source)
         else:
-            self.hot_searches = self._load_example_data()
+            return self._load_example_data(source)
 
-        return self.hot_searches
+    def _load_example_data(self, source: str) -> List[Dict[str, Any]]:
+        """Load example data (fallback)."""
+        # For simplicity, returning dummy data if file not found or just dummy data
+        return [
+            {"rank": 1, "title": f"示例{source}话题1", "hot_value": "100万", "label": "热", "source": source},
+            {"rank": 2, "title": f"示例{source}话题2", "hot_value": "80万", "label": "新", "source": source}
+        ]
 
-    def _load_example_data(self) -> List[Dict[str, Any]]:
-        """Load example data from file."""
-        try:
-            with open(EXAMPLE_DATA_FILE, 'r', encoding='utf-8') as f:
-                data = json.load(f)
-
-            raw_items = data.get("result", {}).get("list", [])
-            return self._normalize_items(raw_items)
-
-        except Exception as e:
-            print(f"Failed to load example data: {e}")
-            return [
-                {"rank": 1, "title": "示例话题", "hot_value": "100万", "label": "热"},
-                {"rank": 2, "title": "测试话题", "hot_value": "80万", "label": "新"}
-            ]
-
-    def _normalize_items(self, raw_items: List[Dict]) -> List[Dict[str, Any]]:
+    def _normalize_items(self, raw_items: List[Dict], source: str) -> List[Dict[str, Any]]:
         """Normalize API response items."""
         normalized = []
         limit = Config.MAX_TOPICS
         for i, item in enumerate(raw_items[:limit]):
-            normalized.append({
-                "rank": i + 1,
-                "title": item.get("hotword", ""),
-                "hot_value": item.get("hotwordnum", "").strip(),
-                "label": item.get("hottag", "")
-            })
+            if source == "weibo":
+                normalized.append({
+                    "rank": i + 1,
+                    "title": item.get("hotword", ""),
+                    "hot_value": item.get("hotwordnum", "").strip(),
+                    "label": item.get("hottag", ""),
+                    "source": "weibo"
+                })
+            elif source == "douyin":
+                # TianAPI Douyin format assumption: word, hotindex
+                hot_index = item.get("hotindex", 0)
+                try:
+                    hot_value_str = f"{int(hot_index) / 10000:.1f}万"
+                except (ValueError, TypeError):
+                    hot_value_str = str(hot_index)
+
+                normalized.append({
+                    "rank": i + 1,
+                    "title": item.get("word", ""),
+                    "hot_value": hot_value_str,
+                    "label": "", # Douyin usually doesn't have tag
+                    "source": "douyin"
+                })
         return normalized
 
     def _process_single_topic(self, topic: Dict[str, Any]) -> Dict[str, Any]:
         """Process a single topic: Search -> LLM -> Result"""
-        print(f"Processing topic: {topic['title']}...")
+        print(f"Processing {topic.get('source', 'unknown')} topic: {topic['title']}...")
         
         # 1. Search
         search_query = f"{topic['title']} {datetime.now().year}年 最新消息"
@@ -138,7 +167,7 @@ class WeiboHotspotAnalyzer:
         current_date_str = datetime.now().strftime("%Y年%m月%d日")
         prompt = f"""
         当前日期是: {current_date_str}。
-        请分析以下微博热搜话题: "{topic['title']}".
+        请分析以下{topic.get('source', '微博')}热搜话题: "{topic['title']}".
         
         搜索结果:
         {search_context}
@@ -189,7 +218,7 @@ class WeiboHotspotAnalyzer:
                 total = (interest * 0.8) + (usefulness * 0.2)
                 scores["total"] = total
                 
-                # Determine quality
+                # Determine quality (kept for internal logic, though removed from UI)
                 if total >= 80:
                     creative["quality"] = "优秀"
                     creative["quality_class"] = "excellent"
@@ -214,17 +243,17 @@ class WeiboHotspotAnalyzer:
                 "creatives": []
             }
 
-    def analyze_topics(self) -> List[Dict[str, Any]]:
-        """Analyze all fetched topics using concurrency."""
-        if not self.hot_searches:
-            print("No hot search data available.")
+    def analyze_topics(self, topics: List[Dict[str, Any]], source: str) -> List[Dict[str, Any]]:
+        """Analyze topics using concurrency and update history."""
+        if not topics:
+            print(f"No {source} data available.")
             return []
 
         results = []
         with concurrent.futures.ThreadPoolExecutor(max_workers=Config.CONCURRENCY) as executor:
             future_to_topic = {
                 executor.submit(self._process_single_topic, topic): topic 
-                for topic in self.hot_searches
+                for topic in topics
             }
             
             for future in concurrent.futures.as_completed(future_to_topic):
@@ -236,7 +265,6 @@ class WeiboHotspotAnalyzer:
 
         # Sort results by rank to maintain order
         results.sort(key=lambda x: x["topic"]["rank"])
-        self.analysis_results = results
         
         # Add to history
         current_time = datetime.now()
@@ -247,61 +275,37 @@ class WeiboHotspotAnalyzer:
             "results": results
         }
         
-        # Overwrite if same hour exists (latest update), else prepend
-        if self.history_data and self.history_data[0].get("timestamp_hour") == timestamp_hour:
-             print(f"Updating existing data for hour: {timestamp_hour}")
-             self.history_data[0] = batch_entry
+        # Select correct history list and file
+        if source == "weibo":
+            history_list = self.history_weibo
+            history_file = HISTORY_DATA_WEIBO_FILE
         else:
-             print(f"Adding new data for hour: {timestamp_hour}")
-             self.history_data.insert(0, batch_entry)
+            history_list = self.history_douyin
+            history_file = HISTORY_DATA_DOUYIN_FILE
 
-        # Keep only last 24 batches (24 hours) to avoid file getting too large
-        self.history_data = self.history_data[:24]
+        # Overwrite if same hour exists (latest update), else prepend
+        if history_list and history_list[0].get("timestamp_hour") == timestamp_hour:
+             print(f"Updating existing {source} data for hour: {timestamp_hour}")
+             history_list[0] = batch_entry
+        else:
+             print(f"Adding new {source} data for hour: {timestamp_hour}")
+             history_list.insert(0, batch_entry)
+
+        # Keep only last 24 batches
+        if len(history_list) > 24:
+            history_list.pop() # Remove last
         
-        self._save_history_data()
+        self._save_history_data(history_list, history_file)
         
         return results
 
-    def generate_html_report(self, output_dir: str = Config.OUTPUT_DIR) -> str:
-        """Generate HTML report from analysis results."""
-        if not self.history_data:
-            print("No analysis results available.")
-            return ""
+    def _generate_section_html(self, history_data: List[Dict], default_source: str = "unknown") -> str:
+        """Helper to generate HTML for a specific history list."""
+        if not history_data:
+            return "<p>暂无数据</p>"
 
-        try:
-            with open(HTML_TEMPLATE_FILE, 'r', encoding='utf-8') as f:
-                template = f.read()
-        except FileNotFoundError:
-            print(f"HTML template not found: {HTML_TEMPLATE_FILE}")
-            return ""
-
-        output_filename = "weibo_analysis_report.html"
-        output_path = os.path.join(output_dir, output_filename)
-
-        # Generate Options for Filter
-        filter_options = []
-        for batch in self.history_data:
-            ts_hour = batch["timestamp_hour"]
-            filter_options.append(f'<option value="{ts_hour}">{ts_hour}</option>')
-        filter_options_html = "\n".join(filter_options)
-
-        # Build Main Content (All Batches)
         all_batches_html = []
-        
-        # We need to calculate global stats based on the LATEST batch for the summary cards
-        latest_batch = self.history_data[0]
-        latest_results = latest_batch["results"]
-        
-        all_creatives = [c for r in latest_results for c in r["creatives"]]
-        total_creatives = len(all_creatives)
-        excellent_count = sum(1 for c in all_creatives if c.get("quality_class") == "excellent")
-        good_count = sum(1 for c in all_creatives if c.get("quality_class") == "good")
-        
-        all_scores = [c["scores"]["total"] for c in all_creatives]
-        avg_score = sum(all_scores) / len(all_scores) if all_scores else 0
-        max_score = max(all_scores) if all_scores else 0
-
-        for batch in self.history_data:
+        for batch in history_data:
             batch_ts = batch["timestamp"]
             batch_ts_hour = batch["timestamp_hour"]
             batch_results = batch["results"]
@@ -311,20 +315,35 @@ class WeiboHotspotAnalyzer:
                 topic = result["topic"]
                 research = result["research"]
                 creatives = result["creatives"]
+                source_platform = topic.get('source', default_source)
 
-                timeline_html = "" # Removed timeline
-                
                 creatives_html = []
-                for creative in creatives:
+                for i, creative in enumerate(creatives):
                     features_html = "\n".join(f'<li>{f}</li>' for f in creative.get("features", []))
-                    
                     scores = creative.get("scores", {"interest": 0, "usefulness": 0, "total": 0})
                     
+                    # Construct creative data for favorite function
+                    creative_id = f"{source_platform}_{batch_ts_hour}_{topic['rank']}_{i}"
+                    creative_data = {
+                        "id": creative_id,
+                        "source": source_platform,
+                        "time": batch_ts,
+                        "topic_title": topic['title'],
+                        "hot_value": topic['hot_value'],
+                        "name": creative.get('name', '未命名'),
+                        "features": creative.get('features', []),
+                        "target_users": creative.get('target_users', '未知'),
+                        "scores": scores
+                    }
+                    creative_json = json.dumps(creative_data).replace('"', '&quot;')
+                    
                     creative_html = f'''
-                    <div class="creative-card {creative.get('quality_class', 'needs-improvement')}">
+                    <div class="creative-card" data-id="{creative_id}">
                         <div class="creative-header">
                             <h3 class="creative-name">{creative.get('name', '未命名')}</h3>
-                            <span class="quality-badge badge-{creative.get('quality_class', 'needs-improvement')}">{creative.get('quality', '未知')}</span>
+                            <button class="fav-btn" onclick="toggleFavorite(this, {creative_json})">
+                                <span class="fav-icon">☆</span> 收藏
+                            </button>
                         </div>
                         <div class="creative-features">
                             <ul>{features_html}</ul>
@@ -351,13 +370,15 @@ class WeiboHotspotAnalyzer:
                     '''
                     creatives_html.append(creative_html)
 
+                topic_label_html = f'<span class="topic-label">{topic["label"]}</span>' if topic.get("label") and topic["label"].strip() else ""
+                
                 topic_section = f'''
                 <section class="topic-section">
                     <div class="topic-header">
                         <span class="topic-rank">{topic['rank']}</span>
                         <div style="flex-grow: 1;">
                             <h2 class="topic-title">{topic['title']}</h2>
-                            <span class="topic-label">{topic['label']}</span>
+                            {topic_label_html}
                             <span class="hot-value">🔥 {topic['hot_value']}</span>
                         </div>
                     </div>
@@ -387,57 +408,88 @@ class WeiboHotspotAnalyzer:
             </div>
             '''
             all_batches_html.append(batch_html)
+            
+        return "\n".join(all_batches_html)
 
-        # Build recommendations (From Latest Batch)
+    def generate_html_report(self, output_dir: str = Config.OUTPUT_DIR) -> str:
+        """Generate HTML report from analysis results."""
+        if not self.history_weibo and not self.history_douyin:
+            print("No analysis results available.")
+            return ""
+
+        try:
+            with open(HTML_TEMPLATE_FILE, 'r', encoding='utf-8') as f:
+                template = f.read()
+        except FileNotFoundError:
+            print(f"HTML template not found: {HTML_TEMPLATE_FILE}")
+            return ""
+
+        output_filename = "weibo_analysis_report.html"
+        output_path = os.path.join(output_dir, output_filename)
+
+        # 1. Generate Filter Options (Combine timestamps from both? Or just use Weibo as main?)
+        # For simplicity, use all unique timestamps from both, sorted.
+        timestamps = set()
+        for batch in self.history_weibo:
+            timestamps.add(batch["timestamp_hour"])
+        for batch in self.history_douyin:
+            timestamps.add(batch["timestamp_hour"])
+        
+        sorted_timestamps = sorted(list(timestamps), reverse=True)
+        
+        filter_options = []
+        for ts_hour in sorted_timestamps:
+            filter_options.append(f'<option value="{ts_hour}">{ts_hour}</option>')
+        filter_options_html = "\n".join(filter_options)
+
+        # 2. Generate Content for Weibo
+        weibo_html = self._generate_section_html(self.history_weibo, default_source="weibo")
+        
+        # 3. Generate Content for Douyin
+        douyin_html = self._generate_section_html(self.history_douyin, default_source="douyin")
+
+        # 4. Generate Recommendations (Top 3 from latest batches of both)
+        latest_creatives = []
+        
+        if self.history_weibo:
+            for r in self.history_weibo[0]["results"]:
+                for c in r["creatives"]:
+                    c["source_title"] = r["topic"]["title"]
+                    c["source_platform"] = "微博"
+                    latest_creatives.append(c)
+        
+        if self.history_douyin:
+            for r in self.history_douyin[0]["results"]:
+                for c in r["creatives"]:
+                    c["source_title"] = r["topic"]["title"]
+                    c["source_platform"] = "抖音"
+                    latest_creatives.append(c)
+        
         sorted_creatives = sorted(
-            [(c["scores"]["total"], c["name"], r["topic"]["title"]) for r in latest_results for c in r["creatives"]], 
-            key=lambda x: x[0], 
+            latest_creatives, 
+            key=lambda x: x["scores"]["total"], 
             reverse=True
         )[:3]
         
         recommendations_html = "\n".join(
             f'''
             <div class="recommendation-item">
-                <h4>{i+1}. {name} (综合评分: {score:.1f})</h4>
-                <p>来自话题: {topic}</p>
+                <h4>{i+1}. {c['name']} (综合评分: {c['scores']['total']:.1f})</h4>
+                <p>来自{c['source_platform']}话题: {c['source_title']}</p>
             </div>
             '''
-            for i, (score, name, topic) in enumerate(sorted_creatives)
+            for i, c in enumerate(sorted_creatives)
         )
 
-        # Replace in template
+        # 5. Replace in template
         report_html = template
         current_time = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
         
-        # Try to replace placeholders first (assuming template is updated)
-        if '<!-- FILTER_OPTIONS_PLACEHOLDER -->' in report_html:
-            report_html = report_html.replace('<!-- FILTER_OPTIONS_PLACEHOLDER -->', filter_options_html)
-        
-        if '<!-- CONTENT_PLACEHOLDER -->' in report_html:
-            report_html = report_html.replace('<!-- CONTENT_PLACEHOLDER -->', "\n".join(all_batches_html))
-        else:
-            # Fallback for old template structure (replace first topic-section block)
-             example_section_start = report_html.find('<section class="topic-section">')
-             if example_section_start != -1:
-                 example_section_end = report_html.find('</section>', example_section_start) + 10
-                 # Find end of all topic sections? We can replace until recommendations
-                 # Better to rely on updated template.
-                 # Let's assume we will update template.
-                 pass
-
-        # Update stats
-        # Stats section removed from template
-        
-        # Inject Recommendations
-        recommendations_start = report_html.find('<div class="recommendation-item">')
-        if recommendations_start != -1:
-             recommendations_end = report_html.find('</section>', recommendations_start)
-             if recommendations_end != -1:
-                 report_html = (
-                    report_html[:recommendations_start] +
-                    recommendations_html +
-                    report_html[recommendations_end:]
-                )
+        report_html = report_html.replace('<!-- UPDATE_TIME_PLACEHOLDER -->', current_time)
+        report_html = report_html.replace('<!-- FILTER_OPTIONS_PLACEHOLDER -->', filter_options_html)
+        report_html = report_html.replace('<!-- WEIBO_CONTENT_PLACEHOLDER -->', weibo_html)
+        report_html = report_html.replace('<!-- DOUYIN_CONTENT_PLACEHOLDER -->', douyin_html)
+        report_html = report_html.replace('<!-- RECOMMENDATIONS_PLACEHOLDER -->', recommendations_html)
 
         with open(output_path, 'w', encoding='utf-8') as f:
             f.write(report_html)
@@ -446,7 +498,7 @@ class WeiboHotspotAnalyzer:
         return output_path
 
 def main():
-    parser = argparse.ArgumentParser(description="Weibo Hotspot Analysis Script")
+    parser = argparse.ArgumentParser(description="Weibo & Douyin Hotspot Analysis Script")
     parser.add_argument("--api-key", default=Config.TIANAPI_KEY, help="API key for TianAPI")
     parser.add_argument("--output-dir", default=Config.OUTPUT_DIR, help="Output directory")
     parser.add_argument("--use-example", action="store_true", help="Use example data instead of API")
@@ -466,15 +518,7 @@ def main():
         while True:
             try:
                 print(f"\n--- Starting Analysis Batch at {datetime.now()} ---")
-                print("Fetching Weibo hot search data...")
-                analyzer.fetch_hot_searches(use_api=not args.use_example)
-
-                print("Analyzing topics and generating creatives (Concurrency Enabled)...")
-                analyzer.analyze_topics()
-
-                print("Generating HTML report...")
-                analyzer.generate_html_report()
-                
+                analyzer.run_full_analysis_cycle(use_api=not args.use_example)
                 print(f"--- Batch Complete. Sleeping for {args.interval}s ---")
                 time.sleep(args.interval)
             except KeyboardInterrupt:
@@ -484,19 +528,7 @@ def main():
                 print(f"Error in loop: {e}")
                 time.sleep(60) # Retry after 1 min on error
     else:
-        print("Fetching Weibo hot search data...")
-        analyzer.fetch_hot_searches(use_api=not args.use_example)
-
-        print("Analyzing topics and generating creatives (Concurrency Enabled)...")
-        analyzer.analyze_topics()
-
-        print("Generating HTML report...")
-        output_path = analyzer.generate_html_report()
-
-        if output_path:
-            print(f"\nAnalysis complete! Report saved to: {output_path}")
-        else:
-            sys.exit(1)
+        analyzer.run_full_analysis_cycle(use_api=not args.use_example)
 
 if __name__ == "__main__":
     main()
