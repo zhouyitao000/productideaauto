@@ -543,7 +543,7 @@
             <button class="tab-btn" onclick="openTab(event, 'favorites')">⭐ 我收藏的创意</button>
         </div>
 
-        <div class="filter-bar">
+        <div id="filterBarContainer" class="filter-bar">
             <label for="timeFilter">选择数据时间:</label>
             <select id="timeFilter" onchange="filterData()">
                 <option value="all">显示全部</option>
@@ -620,20 +620,44 @@
                 renderFavorites();
             } else {
                 if(filterBar) filterBar.style.display = 'flex';
+                filterData(); // Re-apply filter when switching tabs
             }
         }
 
         function filterData() {
             const selectedHour = document.getElementById('timeFilter').value;
-            const batches = document.querySelectorAll('.data-batch');
+            // Find active tab content
+            const activeTab = document.querySelector('.tab-content.active');
+            if (!activeTab || activeTab.id === 'favorites') return;
+
+            const batches = activeTab.querySelectorAll('.data-batch');
+            let hasVisible = false;
             
             batches.forEach(batch => {
                 if (selectedHour === 'all' || batch.dataset.hour === selectedHour) {
                     batch.style.display = 'block';
+                    hasVisible = true;
                 } else {
                     batch.style.display = 'none';
                 }
             });
+
+            // Handle empty state for filter
+            let emptyState = activeTab.querySelector('.filter-empty-state');
+            if (!hasVisible && batches.length > 0) {
+                if (!emptyState) {
+                    emptyState = document.createElement('div');
+                    emptyState.className = 'filter-empty-state';
+                    emptyState.style.textAlign = 'center';
+                    emptyState.style.padding = '3rem';
+                    emptyState.style.color = 'var(--color-text-secondary)';
+                    emptyState.innerHTML = '<p>该时间点暂无数据</p>';
+                    activeTab.appendChild(emptyState);
+                }
+                emptyState.style.display = 'block';
+            } else if (emptyState) {
+                emptyState.style.display = 'none';
+            }
         }
 
         function toggleFavorite(btn, data) {

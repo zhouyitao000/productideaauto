@@ -485,39 +485,8 @@ class WeiboHotspotAnalyzer:
         # 3. Generate Content for Douyin
         douyin_html = self._generate_section_html(self.history_douyin, default_source="douyin")
 
-        # 4. Generate Recommendations (Top 3 from latest batches of both)
-        latest_creatives = []
+        # 4. Generate Recommendations - REMOVED per user request
         
-        if self.history_weibo:
-            for r in self.history_weibo[0]["results"]:
-                for c in r["creatives"]:
-                    c["source_title"] = r["topic"]["title"]
-                    c["source_platform"] = "微博"
-                    latest_creatives.append(c)
-        
-        if self.history_douyin:
-            for r in self.history_douyin[0]["results"]:
-                for c in r["creatives"]:
-                    c["source_title"] = r["topic"]["title"]
-                    c["source_platform"] = "抖音"
-                    latest_creatives.append(c)
-        
-        sorted_creatives = sorted(
-            latest_creatives, 
-            key=lambda x: x["scores"]["total"], 
-            reverse=True
-        )[:3]
-        
-        recommendations_html = "\n".join(
-            f'''
-            <div class="recommendation-item">
-                <h4>{i+1}. {c['name']} (综合评分: {c['scores']['total']:.1f})</h4>
-                <p>来自{c['source_platform']}话题: {c['source_title']}</p>
-            </div>
-            '''
-            for i, c in enumerate(sorted_creatives)
-        )
-
         # 5. Replace in template
         report_html = template
         current_time = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
@@ -526,7 +495,7 @@ class WeiboHotspotAnalyzer:
         report_html = report_html.replace('<!-- FILTER_OPTIONS_PLACEHOLDER -->', filter_options_html)
         report_html = report_html.replace('<!-- WEIBO_CONTENT_PLACEHOLDER -->', weibo_html)
         report_html = report_html.replace('<!-- DOUYIN_CONTENT_PLACEHOLDER -->', douyin_html)
-        report_html = report_html.replace('<!-- RECOMMENDATIONS_PLACEHOLDER -->', recommendations_html)
+        # report_html = report_html.replace('<!-- RECOMMENDATIONS_PLACEHOLDER -->', recommendations_html) # Placeholder removed from template
 
         with open(output_path, 'w', encoding='utf-8') as f:
             f.write(report_html)
