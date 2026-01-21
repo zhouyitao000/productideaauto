@@ -626,38 +626,25 @@
 
         function filterData() {
             const selectedHour = document.getElementById('timeFilter').value;
-            // Find active tab content
-            const activeTab = document.querySelector('.tab-content.active');
-            if (!activeTab || activeTab.id === 'favorites') return;
-
-            const batches = activeTab.querySelectorAll('.data-batch');
-            let hasVisible = false;
+            // Get all batches across all tabs (except favorites which is dynamic)
+            // But we only want to show/hide based on the active tab? 
+            // Actually, the previous logic filtered ALL batches in DOM, but since tabs hide content via display:none, 
+            // we should be careful. 
+            // Let's revert to filtering ALL .data-batch elements, which is safer and ensures content is ready when switching tabs.
+            
+            const batches = document.querySelectorAll('.data-batch');
             
             batches.forEach(batch => {
                 if (selectedHour === 'all' || batch.dataset.hour === selectedHour) {
                     batch.style.display = 'block';
-                    hasVisible = true;
                 } else {
                     batch.style.display = 'none';
                 }
             });
-
-            // Handle empty state for filter
-            let emptyState = activeTab.querySelector('.filter-empty-state');
-            if (!hasVisible && batches.length > 0) {
-                if (!emptyState) {
-                    emptyState = document.createElement('div');
-                    emptyState.className = 'filter-empty-state';
-                    emptyState.style.textAlign = 'center';
-                    emptyState.style.padding = '3rem';
-                    emptyState.style.color = 'var(--color-text-secondary)';
-                    emptyState.innerHTML = '<p>该时间点暂无数据</p>';
-                    activeTab.appendChild(emptyState);
-                }
-                emptyState.style.display = 'block';
-            } else if (emptyState) {
-                emptyState.style.display = 'none';
-            }
+            
+            // Remove any existing empty state messages we added dynamically
+            const emptyStates = document.querySelectorAll('.filter-empty-state');
+            emptyStates.forEach(el => el.remove());
         }
 
         function toggleFavorite(btn, data) {
