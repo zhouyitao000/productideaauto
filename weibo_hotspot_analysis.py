@@ -426,10 +426,7 @@ class WeiboHotspotAnalyzer:
                  pass
 
         # Update stats
-        report_html = report_html.replace('<div class="value">3</div>', f'<div class="value">{excellent_count}</div>')
-        report_html = report_html.replace('<div class="value">2</div>', f'<div class="value">{good_count}</div>')
-        report_html = report_html.replace('<div class="value">78.4</div>', f'<div class="value">{avg_score:.1f}</div>')
-        report_html = report_html.replace('<div class="value">92</div>', f'<div class="value">{max_score:.1f}</div>')
+        # Stats section removed from template
         
         # Inject Recommendations
         recommendations_start = report_html.find('<div class="recommendation-item">')
