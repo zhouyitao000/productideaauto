@@ -359,7 +359,7 @@ class WeiboHotspotAnalyzer:
                         "scores": scores,
                         "competitors": creative.get("competitors", [])
                     }
-                    creative_json = json.dumps(creative_data).replace('"', '&quot;')
+                    creative_json = json.dumps(creative_data).replace('"', '&quot;').replace("'", "&#39;")
                     
                     competitors_html = ""
                     competitors = creative.get("competitors", [])

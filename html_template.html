@@ -709,6 +709,9 @@
                     `;
                 }
 
+                // Escape JSON for HTML attribute
+                const itemJson = JSON.stringify(item).replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+
                 return `
                 <div class="fav-item">
                     <div class="fav-meta">
@@ -725,7 +728,7 @@
                     
                     <div class="creative-header" style="margin-top: 1rem;">
                         <h3 class="creative-name">${item.name}</h3>
-                        <button class="fav-btn active" onclick='toggleFavorite(this, ${JSON.stringify(item)})'>
+                        <button class="fav-btn active" onclick="toggleFavorite(this, ${itemJson})">
                             <span class="fav-icon">★</span> 取消收藏
                         </button>
                     </div>
