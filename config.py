@@ -21,5 +21,5 @@ class Config:
     
     # App Settings
     OUTPUT_DIR = os.getenv("OUTPUT_DIR", ".")
-    MAX_TOPICS = int(os.getenv("MAX_TOPICS", "5"))
+    MAX_TOPICS = int(os.getenv("MAX_TOPICS", "10"))
     CONCURRENCY = int(os.getenv("CONCURRENCY", "3"))
