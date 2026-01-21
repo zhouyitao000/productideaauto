@@ -178,7 +178,8 @@ class WeiboHotspotAnalyzer:
            **重要限制**: 创意必须是 **软件产品 (App/Web)**、**AI应用** 或 **AI解决方案**。不接受实体产品或纯营销活动。
            创意应侧重于如何利用 AI 技术解决用户痛点或提供娱乐价值。
         3. 基于有趣度（趣味性/传播潜力）和有用度（实用价值）对创意进行评分。
-        
+        4. 为每个创意提供一个用于搜索竞品的关键词（search_keywords），用于寻找市场上已有的类似产品。
+
         输出格式 (仅JSON):
         {{
             "research": {{
@@ -196,7 +197,8 @@ class WeiboHotspotAnalyzer:
                     "justification": {{
                         "interest": "有趣度评分理由",
                         "usefulness": "有用度评分理由"
-                    }}
+                    }},
+                    "search_keywords": "用于搜索竞品的关键词 (英文或中文)"
                 }}
             ]
         }}
@@ -210,6 +212,27 @@ class WeiboHotspotAnalyzer:
             creatives = llm_result.get("creatives", [])
             for i, creative in enumerate(creatives):
                 creative["id"] = f"{topic['rank']}-{i+1}"
+                
+                # 3. Competitor Search (New Step)
+                search_keywords = creative.get("search_keywords", creative["name"])
+                print(f"  Searching competitors for '{creative['name']}' using keywords: '{search_keywords}'...")
+                
+                competitors = []
+                try:
+                    # Search for similar products
+                    comp_query = f"similar product app {search_keywords}"
+                    comp_results = self.search_provider.search(comp_query)
+                    
+                    # Take top 2 results
+                    for res in comp_results[:2]:
+                        competitors.append({
+                            "name": res['title'],
+                            "url": res['link']
+                        })
+                except Exception as e:
+                    print(f"  Competitor search failed: {e}")
+                
+                creative["competitors"] = competitors
                 
                 # Calculate total score
                 scores = creative.get("scores", {})
@@ -333,10 +356,23 @@ class WeiboHotspotAnalyzer:
                         "name": creative.get('name', '未命名'),
                         "features": creative.get('features', []),
                         "target_users": creative.get('target_users', '未知'),
-                        "scores": scores
+                        "scores": scores,
+                        "competitors": creative.get("competitors", [])
                     }
                     creative_json = json.dumps(creative_data).replace('"', '&quot;')
                     
+                    competitors_html = ""
+                    competitors = creative.get("competitors", [])
+                    if competitors:
+                        comp_links = []
+                        for comp in competitors:
+                            comp_links.append(f'<a href="{comp["url"]}" target="_blank" rel="noopener noreferrer">{comp["name"]}</a>')
+                        competitors_html = f'''
+                        <div class="competitors-section">
+                            <strong>🔍 参考竞品:</strong> {", ".join(comp_links)}
+                        </div>
+                        '''
+
                     creative_html = f'''
                     <div class="creative-card" data-id="{creative_id}">
                         <div class="creative-header">
@@ -351,6 +387,7 @@ class WeiboHotspotAnalyzer:
                         <div class="target-users">
                             <strong>目标用户:</strong> {creative.get('target_users', '未知')}
                         </div>
+                        {competitors_html}
                         <div class="score-section">
                             <div class="score-breakdown">
                                 <div class="score-bar">

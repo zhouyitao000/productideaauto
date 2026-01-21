@@ -284,6 +284,31 @@
             font-weight: bold;
         }
 
+        .target-users {
+            margin-top: 1rem;
+            font-size: 0.9rem;
+            color: var(--color-text-secondary);
+        }
+
+        .competitors-section {
+            margin-top: 0.75rem;
+            font-size: 0.9rem;
+            color: var(--color-text-secondary);
+            background-color: #f3f4f6;
+            padding: 0.5rem;
+            border-radius: 4px;
+        }
+
+        .competitors-section a {
+            color: var(--color-excellent);
+            text-decoration: none;
+            margin-right: 0.5rem;
+        }
+
+        .competitors-section a:hover {
+            text-decoration: underline;
+        }
+
         .score-section {
             margin-top: 1.5rem;
             padding-top: 1rem;
@@ -674,6 +699,16 @@
                 const featuresHtml = item.features.map(f => `<li>${f}</li>`).join('');
                 const scores = item.scores || {interest: 0, usefulness: 0, total: 0};
                 
+                let competitorsHtml = '';
+                if (item.competitors && item.competitors.length > 0) {
+                    const compLinks = item.competitors.map(c => `<a href="${c.url}" target="_blank" rel="noopener noreferrer">${c.name}</a>`).join(', ');
+                    competitorsHtml = `
+                    <div class="competitors-section" style="margin-top: 1rem;">
+                        <strong>🔍 参考竞品:</strong> ${compLinks}
+                    </div>
+                    `;
+                }
+
                 return `
                 <div class="fav-item">
                     <div class="fav-meta">
@@ -698,6 +733,8 @@
                     <div class="creative-features">
                         <ul>${featuresHtml}</ul>
                     </div>
+                    
+                    ${competitorsHtml}
                     
                     <div class="score-section">
                         <div class="total-score" style="text-align: left; font-size: 1.2rem;">
