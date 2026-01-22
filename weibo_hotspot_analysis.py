@@ -16,8 +16,10 @@ from config import Config
 from providers import get_search_provider, get_llm_provider
 import time
 import shutil
+from datetime import datetime, timedelta, timezone
 
 # Constants
+CHINA_TZ = timezone(timedelta(hours=8))
 HISTORY_DATA_WEIBO_FILE = os.path.join(Config.BASE_DIR, "history_data.json")
 HISTORY_DATA_DOUYIN_FILE = os.path.join(Config.BASE_DIR, "history_data_douyin.json")
 HTML_TEMPLATE_FILE = os.path.join(Config.BASE_DIR, "html_template.html")
