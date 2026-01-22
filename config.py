@@ -19,9 +19,10 @@ class Config:
     LLM_MODEL = os.getenv("LLM_MODEL", "deepseek-chat")
     
     # Search Configuration
-    # Options: "duckduckgo", "google" (requires SERPER_API_KEY), "baidu"
+    # Options: "duckduckgo", "google" (requires SERPER_API_KEY), "baidu", "tavily" (requires TAVILY_API_KEY)
     SEARCH_PROVIDER = os.getenv("SEARCH_PROVIDER", "duckduckgo")
     SERPER_API_KEY = os.getenv("SERPER_API_KEY")
+    TAVILY_API_KEY = os.getenv("TAVILY_API_KEY")
     
     # App Settings
     OUTPUT_DIR = os.getenv("OUTPUT_DIR", ".")

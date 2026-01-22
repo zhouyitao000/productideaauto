@@ -16,6 +16,11 @@ try:
 except ImportError:
     OpenAI = None
 
+try:
+    from tavily import TavilyClient
+except ImportError:
+    TavilyClient = None
+
 logger = logging.getLogger(__name__)
 
 class SearchProvider(ABC):
@@ -126,6 +131,40 @@ class BaiduSearchProvider(SearchProvider):
             logger.error(f"Baidu search failed: {e}")
             return []
 
+class TavilySearchProvider(SearchProvider):
+    def __init__(self, api_key: str):
+        self.api_key = api_key
+
+    def search(self, query: str, limit: int = 5) -> List[Dict[str, str]]:
+        if not self.api_key:
+            logger.warning("Tavily API key not configured.")
+            return []
+            
+        if not TavilyClient:
+            logger.warning("tavily-python not installed.")
+            return []
+
+        try:
+            client = TavilyClient(api_key=self.api_key)
+            response = client.search(
+                query=query,
+                search_depth="advanced",
+                max_results=limit
+            )
+            
+            results = response.get("results", [])
+            return [
+                {
+                    "title": r.get("title", ""),
+                    "link": r.get("url", ""),
+                    "snippet": r.get("content", "")
+                }
+                for r in results
+            ]
+        except Exception as e:
+            logger.error(f"Tavily search failed: {e}")
+            return []
+
 class MockSearchProvider(SearchProvider):
     def search(self, query: str, limit: int = 5) -> List[Dict[str, str]]:
         return [
@@ -222,6 +261,8 @@ def get_search_provider(config) -> SearchProvider:
         return SerperSearchProvider(config.SERPER_API_KEY)
     elif provider_type == "baidu":
         return BaiduSearchProvider()
+    elif provider_type == "tavily":
+        return TavilySearchProvider(config.TAVILY_API_KEY)
         
     return MockSearchProvider()
 
