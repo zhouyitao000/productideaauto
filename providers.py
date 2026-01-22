@@ -1,5 +1,8 @@
 import json
 import logging
+import requests
+import re
+from urllib.parse import quote
 from abc import ABC, abstractmethod
 from typing import List, Dict, Any, Optional
 
@@ -39,6 +42,88 @@ class DuckDuckGoSearchProvider(SearchProvider):
                 ]
         except Exception as e:
             logger.error(f"DuckDuckGo search failed: {e}")
+            return []
+
+class SerperSearchProvider(SearchProvider):
+    def __init__(self, api_key: str):
+        self.api_key = api_key
+        self.url = "https://google.serper.dev/search"
+
+    def search(self, query: str, limit: int = 5) -> List[Dict[str, str]]:
+        if not self.api_key:
+            logger.warning("Serper API key not configured.")
+            return []
+        
+        headers = {
+            'X-API-KEY': self.api_key,
+            'Content-Type': 'application/json'
+        }
+        payload = json.dumps({
+            "q": query,
+            "num": limit,
+            "gl": "cn",
+            "hl": "zh-cn"
+        })
+        
+        try:
+            response = requests.post(self.url, headers=headers, data=payload, timeout=10)
+            response.raise_for_status()
+            results = response.json().get("organic", [])
+            return [
+                {
+                    "title": r.get("title", ""),
+                    "link": r.get("link", ""),
+                    "snippet": r.get("snippet", "")
+                }
+                for r in results
+            ]
+        except Exception as e:
+            logger.error(f"Serper search failed: {e}")
+            return []
+
+class BaiduSearchProvider(SearchProvider):
+    def search(self, query: str, limit: int = 5) -> List[Dict[str, str]]:
+        # Basic scraper for Baidu - Note: Baidu often blocks scrapers
+        url = f"https://www.baidu.com/s?wd={quote(query)}"
+        headers = {
+            "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36"
+        }
+        
+        try:
+            response = requests.get(url, headers=headers, timeout=10)
+            response.raise_for_status()
+            
+            # Simple regex extraction (brittle but no extra deps)
+            # Extracting title and url patterns from Baidu's HTML structure
+            content = response.text
+            results = []
+            
+            # This is a very simplified regex and might break if Baidu changes HTML
+            # Looking for result containers
+            # <h3 class="t"><a href="...">Title</a></h3>
+            
+            # Use a simple approach: Split by result container if possible, or just regex findall
+            # Regex for standard result link
+            matches = re.finditer(r'<h3[^>]*>[\s\S]*?<a[^>]*href="([^"]+)"[^>]*>([\s\S]*?)</a>[\s\S]*?</h3>', content)
+            
+            for match in matches:
+                if len(results) >= limit:
+                    break
+                link = match.group(1)
+                title_raw = match.group(2)
+                # Remove HTML tags from title
+                title = re.sub(r'<[^>]+>', '', title_raw).strip()
+                
+                # Baidu links are redirects, but we use them as is
+                results.append({
+                    "title": title,
+                    "link": link,
+                    "snippet": "Baidu Search Result" # Snippet extraction is harder with regex
+                })
+                
+            return results
+        except Exception as e:
+            logger.error(f"Baidu search failed: {e}")
             return []
 
 class MockSearchProvider(SearchProvider):
@@ -129,8 +214,15 @@ class MockLLMProvider(LLMProvider):
         }
 
 def get_search_provider(config) -> SearchProvider:
-    if config.SEARCH_PROVIDER == "duckduckgo":
+    provider_type = config.SEARCH_PROVIDER.lower()
+    
+    if provider_type == "duckduckgo":
         return DuckDuckGoSearchProvider()
+    elif provider_type == "google" or provider_type == "serper":
+        return SerperSearchProvider(config.SERPER_API_KEY)
+    elif provider_type == "baidu":
+        return BaiduSearchProvider()
+        
     return MockSearchProvider()
 
 def get_llm_provider(config) -> LLMProvider:

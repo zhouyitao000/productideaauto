@@ -155,7 +155,8 @@ class WeiboHotspotAnalyzer:
         print(f"Processing {topic.get('source', 'unknown')} topic: {topic['title']}...")
         
         # 1. Search
-        search_query = f"{topic['title']} {datetime.now().year}年 最新消息"
+        current_year = datetime.now(CHINA_TZ).year
+        search_query = f"{topic['title']} {current_year}年 最新消息"
         search_results = self.search_provider.search(search_query)
         
         search_context = "\n".join([
@@ -164,7 +165,7 @@ class WeiboHotspotAnalyzer:
         ])
         
         # 2. LLM Generation
-        current_date_str = datetime.now().strftime("%Y年%m月%d日")
+        current_date_str = datetime.now(CHINA_TZ).strftime("%Y年%m月%d日")
         prompt = f"""
         当前日期是: {current_date_str}。
         请分析以下{topic.get('source', '微博')}热搜话题: "{topic['title']}".
@@ -198,7 +199,7 @@ class WeiboHotspotAnalyzer:
                         "interest": "有趣度评分理由",
                         "usefulness": "有用度评分理由"
                     }},
-                    "search_keywords": "用于搜索竞品的关键词 (英文或中文)"
+                    "search_keywords": "用于搜索竞品的关键词 (请提供具体的App类别或功能名称，不要用泛泛的词)"
                 }}
             ]
         }}
@@ -219,16 +220,33 @@ class WeiboHotspotAnalyzer:
                 
                 competitors = []
                 try:
-                    # Search for similar products
-                    comp_query = f"similar product app {search_keywords}"
+                    # Search for similar products - Use Chinese query to avoid English grammar results
+                    # Previously "similar product app" caused dictionary lookups for "similar"
+                    comp_query = f"{search_keywords} 类似App 竞品"
                     comp_results = self.search_provider.search(comp_query)
                     
-                    # Take top 2 results
-                    for res in comp_results[:2]:
+                    # Take top 2 results, filtering out similarweb and dictionary/grammar sites
+                    count = 0
+                    for res in comp_results:
+                        if count >= 2:
+                            break
+                        
+                        link = res['link'].lower()
+                        title = res['title'].lower()
+                        
+                        # Skip analytics tools
+                        if "similarweb.com" in link or "similarweb" in title:
+                            continue
+                            
+                        # Skip dictionary/grammar sites (common DDG issue with 'similar')
+                        if any(x in link or x in title for x in ['dictionary', 'thesaurus', 'grammar', 'stackexchange', 'definition', 'meaning']):
+                            continue
+                            
                         competitors.append({
                             "name": res['title'],
                             "url": res['link']
                         })
+                        count += 1
                 except Exception as e:
                     print(f"  Competitor search failed: {e}")
                 
@@ -290,7 +308,8 @@ class WeiboHotspotAnalyzer:
         results.sort(key=lambda x: x["topic"]["rank"])
         
         # Add to history
-        current_time = datetime.now()
+        # Use China Standard Time (UTC+8)
+        current_time = datetime.now(CHINA_TZ)
         timestamp_hour = current_time.strftime("%Y-%m-%d %H:00")
         batch_entry = {
             "timestamp": current_time.strftime("%Y-%m-%d %H:%M:%S"),
@@ -489,7 +508,8 @@ class WeiboHotspotAnalyzer:
         
         # 5. Replace in template
         report_html = template
-        current_time = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        # Use China Standard Time (UTC+8) for update time
+        current_time = datetime.now(CHINA_TZ).strftime("%Y-%m-%d %H:%M:%S")
         
         report_html = report_html.replace('<!-- UPDATE_TIME_PLACEHOLDER -->', current_time)
         report_html = report_html.replace('<!-- FILTER_OPTIONS_PLACEHOLDER -->', filter_options_html)
